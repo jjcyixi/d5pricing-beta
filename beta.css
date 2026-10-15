@@ -143,23 +143,26 @@ body[data-page="pricing"] .benefit-label { color:#bfa4e7; font-size:11px; font-w
 .credit-amount .launch-gift { font-size:17px; font-weight:500; }
 .credit-amount small { font-size:10px; font-weight:400; }
 .credit-basis { color:#9e93ab; font-size:11px; line-height:19px; }
-body[data-page="pricing"] .capacity-zone { margin-top:16px; padding:14px 0 0; border:0; border-top:1px solid rgba(255,255,255,.08); border-radius:0; background:none; }
-body[data-page="pricing"] .capacity-label { font-size:10px; color:#a69bb2; line-height:18px; }
-body[data-page="pricing"] .generation-output { display:inline; font-size:12px; line-height:25px; }
-body[data-page="pricing"] .generation-output b { font-size:18px; font-weight:500; line-height:28px; color:#e1d8ee; }
-body[data-page="pricing"] .generation-or { margin-left:6px; color:#958a9f; font-size:11px; }
-body[data-page="pricing"] .pool-note { font-size:10px; line-height:17px; margin-top:3px; }
-body[data-page="pricing"] .generation-assumptions { font-size:10px; margin-top:6px; }
-body[data-page="pricing"] .generation-assumptions summary { color:#a299ae; }
+body[data-page="pricing"] .capacity-zone {
+  display:flex; flex-direction:column; gap:6px;
+  margin-top:14px; padding:14px 14px 12px;
+  border:1px solid rgba(255,255,255,.1); border-radius:12px;
+  background:rgba(255,255,255,.03);
+}
+body[data-page="pricing"] .capacity-label { font-size:11px; font-weight:600; letter-spacing:.03em; color:#a69bb2; line-height:18px; text-transform:none; }
+body[data-page="pricing"] .generation-output { display:block; font-size:17px; line-height:1.45; color:var(--text-80); white-space:normal; }
+body[data-page="pricing"] .generation-output b { font-size:22px; font-weight:600; line-height:1.2; color:#fff; }
+body[data-page="pricing"] .generation-or { margin-right:4px; margin-left:0; color:#958a9f; font-size:12px; }
+body[data-page="pricing"] .pool-note { font-size:11px; line-height:17px; margin-top:2px; color:#9e93ab; }
+body[data-page="pricing"] .generation-assumptions { font-size:11px; margin-top:4px; }
+body[data-page="pricing"] .generation-assumptions summary { color:#a299ae; cursor:pointer; }
 body[data-page="pricing"] .plan-list { gap:10px; margin-top:16px; }
 body[data-page="pricing"] .plan-list li { font-size:12px; line-height:21px; color:#c2bdc8; gap:8px; }
 body[data-page="pricing"] .plan-list b { font-weight:500; color:#e7e3ec; }
 body[data-page="pricing"] .plan-list .check { width:13px; height:13px; opacity:.7; margin-top:4px; }
-body[data-page="pricing"] .benefit-divider { display:none; }
+body[data-page="pricing"] .benefit-divider { height:1px; margin:16px 0; background:var(--border-10); }
 body[data-page="pricing"] .benefit-workflow { padding:0; }
 body[data-page="pricing"] .benefit-workflow .benefit-label { color:#aaa3b3; }
-body[data-page="pricing"] .feature-inheritance { font-size:11px; margin-top:9px; color:#a99fb7; }
-body[data-page="pricing"] .feature-storage { font-size:11px; line-height:20px; margin-top:12px; color:#a69ab6; }
 body[data-page="pricing"] .benefit-terms { margin-top:auto; border-top:1px solid var(--border-6); padding-top:14px; font-size:11px; color:#9a92a3; }
 body[data-page="pricing"] .education { margin:24px 0 0; padding:0; }
 body[data-page="pricing"] .education-inner { display:flex; width:100%; min-height:76px; padding:20px 26px; border:1px solid var(--border-10); border-radius:12px; background:#101012; gap:12px 20px; }
@@ -181,7 +184,7 @@ body[data-page="pricing"] .faq h2 { font-size:28px; font-weight:500; }
 body[data-page="pricing"] .faq-list summary { font-size:14px; }
 body[data-page="pricing"] .beta-footer { padding-block:32px 84px; background:#080809; border-top:1px solid var(--border-6); }
 @media (min-width:901px) {
- body[data-page="pricing"] .benefit-ai { min-height:405px; }
+ body[data-page="pricing"] .benefit-ai { min-height:0; }
 }
 @media (max-width:900px) {
  body[data-page="pricing"] .plan-grid:not(.is-team) { grid-template-columns:1fr; max-width:560px; margin:auto; gap:16px; }
@@ -221,10 +224,309 @@ body[data-page="pricing"] .hero { padding-top:38px; padding-bottom:24px; }
 body[data-page="pricing"] .hero h1 { font-size:clamp(30px,3vw,40px); }
 body[data-page="pricing"] .plan-card:not(.seat-card) .plan-zone-a { min-height:200px; }
 body[data-page="pricing"] .benefit-ai { gap:0; min-height:0; outline:0; }
-body[data-page="pricing"] .benefit-stack .plan-list li { padding:0; }
-body[data-page="pricing"] .capacity-zone { display:block; }
-body[data-page="pricing"] .generation-output { white-space:nowrap; }
-body[data-page="pricing"] .capacity-label { margin-bottom:5px; }
-body[data-page="pricing"] .feature-upgrade { background:none; border:0; }
-body[data-page="pricing"] .feature-upgrade [data-features-list] li:first-child { font-size:12px; }
+body[data-page="pricing"] .capacity-label { margin-bottom:2px; }
+/* output45 Pro incremental feel — do not flatten */
+body[data-page="pricing"] .feature-upgrade {
+  padding:14px; border:1px solid rgba(143,148,251,.38); border-radius:12px;
+  background:rgba(143,148,251,.08);
+}
+body[data-page="pricing"] .feature-upgrade .benefit-label { color:#c9d3ff; }
+body[data-page="pricing"] .feature-inheritance { font-size:12px; line-height:1.6; margin-top:8px; color:var(--text-60); }
+body[data-page="pricing"] .feature-upgrade [data-features-list] li:first-child { font-size:15px; color:#fff; }
+body[data-page="pricing"] .feature-upgrade [data-features-list] li:first-child .check { filter:brightness(1.25); }
+body[data-page="pricing"] .feature-storage { font-size:12px; line-height:1.6; margin-top:8px; color:var(--text-60); }
+body[data-page="pricing"] .pro-retained { margin:6px 0 0; color:#c9d3ff; font-size:12px; line-height:1.55; }
+body[data-page="pricing"] .benefit-stack .plan-list { gap:2px; }
+body[data-page="pricing"] .benefit-stack .plan-list li { font-size:13px; line-height:20px; padding:6px 0; }
+body[data-page="pricing"] .plan-list .check { width:15px; height:15px; }
 @media(max-width:900px) { body[data-page="pricing"] .plan-card:not(.seat-card) .plan-zone-a { min-height:0; } }
+
+
+/* Lovart-style estimate tip */
+body[data-page="pricing"] .capacity-label-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 2px;
+}
+body[data-page="pricing"] .estimate-tip {
+  position: relative;
+  flex: 0 0 auto;
+  width: 16px;
+  height: 16px;
+  padding: 0;
+  border-radius: 50%;
+  border: 1px solid rgba(255,255,255,.28);
+  background: transparent;
+  color: #a69bb2;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 14px;
+  cursor: help;
+}
+body[data-page="pricing"] .estimate-tip::after {
+  content: attr(data-tip);
+  position: absolute;
+  left: 50%;
+  bottom: calc(100% + 8px);
+  transform: translateX(-50%);
+  width: max-content;
+  max-width: 240px;
+  padding: 8px 10px;
+  border-radius: 8px;
+  background: #2a2433;
+  border: 1px solid rgba(255,255,255,.12);
+  color: #efeaf6;
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 1.45;
+  text-align: left;
+  white-space: normal;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .12s ease;
+  z-index: 20;
+  box-shadow: 0 8px 24px rgba(0,0,0,.35);
+}
+body[data-page="pricing"] .estimate-tip:hover::after,
+body[data-page="pricing"] .estimate-tip:focus-visible::after {
+  opacity: 1;
+}
+
+/* Team / business — CN 3.2: one Teams product + seat entitlement compare */
+body[data-page="pricing"] .plan-grid.is-team {
+  grid-template-columns: minmax(0, 1fr);
+  max-width: min(1080px, 100%);
+  margin-inline: auto;
+  gap: 0;
+}
+body[data-page="pricing"] .plan-grid.is-team .biz-module--team-only {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 0;
+}
+body[data-page="pricing"] .plan-grid.is-team .biz-module-head {
+  gap: 6px;
+  padding: 0 2px 2px;
+  text-align: left;
+}
+body[data-page="pricing"] .plan-grid.is-team .biz-module-head h2 {
+  font-size: 28px;
+  line-height: 36px;
+  font-weight: 550;
+  letter-spacing: -.02em;
+  color: #fff;
+}
+body[data-page="pricing"] .plan-grid.is-team .biz-module-head > p {
+  margin: 0;
+  font-size: 14px;
+  line-height: 22px;
+  font-weight: 400;
+  color: #a9a5ae;
+}
+body[data-page="pricing"] .team-plan-card {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+  padding: 26px;
+  border-radius: 16px;
+  background: #101012;
+  border: 1px solid #2b2a2e;
+  box-shadow: none;
+  min-width: 0;
+}
+body[data-page="pricing"] .team-hero {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+body[data-page="pricing"] .team-plan-card .team-capacity {
+  margin: 0;
+  padding: 14px 16px;
+  border: 1px solid rgba(148, 89, 255, .22);
+  border-radius: 12px;
+  background: linear-gradient(130deg, rgba(148, 89, 255, .10), transparent);
+}
+body[data-page="pricing"] .team-plan-card .capacity-title {
+  font-size: 13px;
+  line-height: 20px;
+  font-weight: 500;
+  color: #e8e4ef;
+}
+body[data-page="pricing"] .team-cta-row {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+body[data-page="pricing"] .team-plan-card .plan-button {
+  margin: 0;
+  flex: 1 1 180px;
+  min-width: 0;
+  height: 44px;
+  min-height: 44px;
+  font-size: 13px;
+  font-weight: 500;
+  border-radius: 8px;
+}
+body[data-page="pricing"] .team-plan-card .plan-button--primary {
+  background: #9e70e7;
+  border: 1px solid #9e70e7;
+  color: #fff;
+}
+body[data-page="pricing"] .team-plan-card .plan-button--primary:hover {
+  filter: brightness(1.13);
+}
+body[data-page="pricing"] .team-plan-card .plan-button--secondary {
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, .22);
+  color: #efedf3;
+  opacity: 1;
+  cursor: pointer;
+}
+body[data-page="pricing"] .team-plan-card .plan-button--secondary:hover {
+  filter: none;
+  background: rgba(255, 255, 255, .06);
+  border-color: rgba(255, 255, 255, .34);
+  color: #fff;
+}
+body[data-page="pricing"] .team-body-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr);
+  gap: 18px;
+  align-items: stretch;
+}
+body[data-page="pricing"] .team-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 18px 16px;
+  border-radius: 12px;
+  background: #18151d;
+  border: 1px solid rgba(255, 255, 255, .06);
+  min-width: 0;
+}
+body[data-page="pricing"] .team-panel .benefit-label {
+  margin: 0;
+  font-size: 12px;
+  line-height: 16px;
+  font-weight: 500;
+  letter-spacing: .02em;
+  color: #bfa4e7;
+}
+body[data-page="pricing"] .team-panel--seats .benefit-label {
+  color: #c9d3ff;
+}
+body[data-page="pricing"] .team-plan-card .plan-list {
+  gap: 2px;
+  margin: 0;
+}
+body[data-page="pricing"] .team-plan-card .plan-list li {
+  font-size: 13px;
+  line-height: 20px;
+  padding: 5px 0;
+  min-height: 0;
+  color: #e8e4ef;
+}
+body[data-page="pricing"] .team-plan-card .plan-list li em {
+  display: none;
+}
+body[data-page="pricing"] .seat-compare-wrap {
+  overflow-x: auto;
+  margin: 0 -2px;
+}
+body[data-page="pricing"] .seat-compare {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+  font-size: 13px;
+  line-height: 18px;
+}
+body[data-page="pricing"] .seat-compare th,
+body[data-page="pricing"] .seat-compare td {
+  padding: 10px 10px;
+  text-align: left;
+  vertical-align: top;
+  border-bottom: 1px solid rgba(255, 255, 255, .06);
+  word-break: break-word;
+}
+body[data-page="pricing"] .seat-compare thead th {
+  font-size: 12px;
+  font-weight: 500;
+  color: #c9d3ff;
+  background: rgba(255, 255, 255, .03);
+  border-bottom: 1px solid rgba(255, 255, 255, .1);
+}
+body[data-page="pricing"] .seat-compare thead th:first-child {
+  color: #9e93ab;
+  width: 38%;
+}
+body[data-page="pricing"] .seat-compare thead th:nth-child(2),
+body[data-page="pricing"] .seat-compare thead th:nth-child(3) {
+  width: 31%;
+  text-align: center;
+}
+body[data-page="pricing"] .seat-compare tbody th {
+  font-weight: 400;
+  color: #b2aab9;
+  width: 38%;
+}
+body[data-page="pricing"] .seat-compare tbody td {
+  color: #e8e4ef;
+  text-align: center;
+  font-weight: 500;
+}
+body[data-page="pricing"] .seat-compare tbody tr:last-child th,
+body[data-page="pricing"] .seat-compare tbody tr:last-child td {
+  border-bottom: 0;
+}
+body[data-page="pricing"] .team-foot-note {
+  margin: 0;
+  font-size: 12px;
+  line-height: 18px;
+  color: #8f8799;
+}
+body[data-page="pricing"] .team-plan-card .benefit-terms {
+  margin-top: 0;
+  border-top: 1px solid var(--border-6);
+  padding-top: 14px;
+}
+body[data-page="pricing"] .team-plan-card .benefit-terms summary {
+  cursor: pointer;
+  color: #9a92a3;
+  font-size: 12px;
+}
+body[data-page="pricing"] .team-plan-card .benefit-terms p {
+  margin-top: 8px;
+  font-size: 11px;
+  line-height: 1.55;
+  color: #9a92a3;
+}
+@media (max-width: 900px) {
+  body[data-page="pricing"] .team-body-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  body[data-page="pricing"] .plan-grid.is-team .biz-module-head h2 {
+    font-size: 24px;
+    line-height: 32px;
+  }
+}
+@media (max-width: 640px) {
+  body[data-page="pricing"] .team-plan-card {
+    padding: 20px 16px;
+    gap: 18px;
+  }
+  body[data-page="pricing"] .team-cta-row {
+    flex-direction: column;
+  }
+  body[data-page="pricing"] .team-cta-row .plan-button {
+    flex: 1 1 auto;
+    width: 100%;
+  }
+  body[data-page="pricing"] .seat-compare th,
+  body[data-page="pricing"] .seat-compare td {
+    padding: 8px 6px;
+    font-size: 12px;
+  }
+}

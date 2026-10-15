@@ -1,7 +1,36 @@
-# D5 Pricing Beta
+# November launch pricing Beta
 
-Static demo for GitHub Pages.
+独立于 V3/V4，可直接打开本地 `index.html`。服务成功启动后的入口：[本机预览](http://127.0.0.1:8768/)，[独立充值页](http://127.0.0.1:8768/topup.html)。
 
-Open: https://jjcyixi.github.io/d5pricing-beta/
+- 默认月付；Basic ¥49/月、¥399/年，Pro ¥200/月、¥1920/年。
+- 两者均为每月 1000 基础积分，首发窗口内合资格批次加赠 500。
+- 购买按钮打开只读订单预览；没有真实支付、账号变更或销售提交。
+- 中文/英文切换；导出按钮输出当前代码中的方案与订单快照。
+- 本地仅保存语言、计费周期、受众偏好。代码版本变化时回到默认月付。
 
-Cloud sync Worker is under `cloudflare-worker/` (not required to view the page).
+## 10/15 第二轮设计
+
+当前设计/协作/验收说明见 [REDESIGN.md](REDESIGN.md)。首发规则已合并为一处短带；编辑器与自包含HTML导出已完成真实Chrome验收（100+17+7项）。底部工具条点「编辑页面」，支持直接改文案、字号颜色对齐、自动保存、撤销重做、JSON导入导出、HTML离线导出。价格积分等业务事实锁定。离线HTML可再次编辑导出；教育官网需联网，独立充值页仅本机在线预览可用。历史下方“沙箱拒绝监听/CDP”仅指原coding沙箱；主代理已从Portal实际跑通8768和Chrome验收。
+
+规则来源、冲突处理、修改清单与未完成验收见 [REVIEW.md](REVIEW.md)。
+
+## 运行
+
+8768 空闲时，在当前目录启动：
+
+```sh
+python3 -m http.server 8768 --bind 127.0.0.1
+```
+
+如果该端口已有指向此目录的服务，直接复用；不要替换 8767 的 V4 服务。当前执行沙箱拒绝监听本机端口，后台启动失败记录在 `acceptance/server.log`。
+
+## 验证
+
+从 workspace 根目录运行：
+
+```sh
+PATH=/opt/homebrew/bin:$PATH node pricing-beta-202611/acceptance/logic-check.cjs
+python3 pricing-beta-202611/acceptance/browser-check.py
+```
+
+浏览器脚本复用 `tmp/v4-cdp-check.py` 的连接、调用与求值辅助代码，在 9444 创建独立测试标签。它覆盖 1440/390 × 中文/英文 × 月付/年付 × 个人/团队，并保存页面、订单、充值页截图；不会导航已有 V4 标签。当前环境的 CDP 网络连接受限，执行结果如实记录为 blocked。
