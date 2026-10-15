@@ -1,14 +1,25 @@
-/* Beta page editor — V3/V4 freedom + offline HTML. Business defaults stay in data.js; demo overlay is draft-only. */
+/* Beta page editor rewrite EDIT-MAX — V3 toolbar + contenteditable; demo prices/credits inline-editable; cross-plan isolation kept. */
 (function () {
   'use strict';
-  const SCHEMA = 'd5-beta-editor-gork-v1';
-  const LEGACY_SCHEMAS = new Set(['d5-beta-editor-v1', 'd5-beta-editor-gork-v1']);
-  const revision = window.D5Data.DATA_REVISION;
+
+  const SCHEMA = 'd5-beta-editor-gork-v2';
+  const LEGACY_SCHEMAS = new Set([
+    'd5-beta-editor-v1',
+    'd5-beta-editor-gork-v1',
+    'd5-beta-editor-gork-v2'
+  ]);
+  const revision = window.D5Data?.DATA_REVISION;
+  if (!revision) {
+    console.error('[D5Editor] D5Data missing — editor aborted');
+    return;
+  }
+
   const boot = window.D5_EDITOR_BOOT || null;
   const bundle = window.D5_OFFLINE_BUNDLE || null;
   const STORE = 'd5-pricing-beta-gork-v1' + (boot ? '-offline-' + boot.id : '');
   const LEGACY_STORE = 'd5-beta-copy-v1' + (boot ? '-offline-' + boot.id : '');
   const clone = (x) => JSON.parse(JSON.stringify(x));
+
   const emptyDraft = () => ({
     schema: SCHEMA,
     dataRevision: revision,
@@ -20,30 +31,67 @@
   });
 
   let draft = emptyDraft();
-  let editing = false;
+  let editing = false; // toggled on at boot for direct edit
+  const DEFAULT_EDIT_ON = true;
   let selected = null;
   let dirty = false;
   let saving = null;
   let storageError = '';
+  // HARD RULE (手改优先): while applying draft → DOM, block commit so a re-render
+  // cannot write data.js / i18n defaults back into draft.copy and wipe hand edits.
+  let applyingDom = false;
   const fields = new Map();
   const undo = [];
   const redo = [];
 
   const lang = () => (window.state?.lang === 'en' ? 'en' : 'zh');
-  const idFor = (el) => {
-    const key = el.dataset.editKey || el.getAttribute('data-edit') || el.dataset.editAuto;
-    return lang() + ':' + key;
-  };
-  const keyOf = (el) => el.dataset.editKey || el.getAttribute('data-edit') || el.dataset.editAuto;
+  const keyOf = (el) =>
+    el?.dataset?.editKey || el?.getAttribute?.('data-edit') || el?.dataset?.editAuto || '';
+  const idFor = (el) => lang() + ':' + keyOf(el);
+
+  const SWEEP = [
+    '.hero h1', '.hero p', '.hero .beta-marker',
+    '.education-inner strong', '.education-inner span', '.education-inner a',
+    '.billing > span', '.billing-annual > span', '.billing-annual > b',
+    '.segmented [data-audience]',
+    '.plan-desc', '.plan-name h2', '.plan-button', '.product-scope', '.pro-retained',
+    '.price-period', '.price-context',
+    '.credit-kicker', '.credit-basis', '.benefit-label', '.feature-inheritance', '.feature-storage',
+    '.capacity-label', '.generation-output', '.pool-note',
+    '.generation-assumptions summary', '.generation-assumptions p',
+    '.plan-list li span', '.benefit-terms summary', '.benefit-terms li span', '.benefit-terms p',
+    '.section-head h2', '.section-head p', '.compare-hint', '.comparison-note',
+    '.faq-title h2', '.faq-list summary span', '.faq-list details p',
+    '.compare-head th', '.compare-group span', '.compare-row .lead',
+    '.compare-table .lead span', '.compare-text',
+    '.launch-band-head strong', '.launch-band-head span', '.launch-band-head a',
+    '#launch-details summary', '#launch-details p', '#launch-details a',
+    '.team-intro h2', '.team-intro p', '.biz-module-head h2', '.biz-module-head p',
+    '.biz-module-note', '.biz-module-tagline',
+    '.seat-card .plan-name h2', '.seat-card .plan-desc', '.seat-card .plan-button span',
+    '.seat-card .product-scope', '.capacity-title',
+    '.beta-footer [data-edit-key]', '.footer-links a', '.footer-links button',
+    '.preview-top .beta-marker', '#preview-title', '.preview-demo', '.order-note', '.preview-done',
+    '.order-row dt', '.global-nav .section-nav a', '.skip-link',
+    '.plan-list li',
+    '.faq-list summary',
+    '.compare-table th',
+    '.compare-table td',
+    '.capacity-sub',
+    '.text-link',
+    '.education-inner'
+  ];
 
   function sourceDemoPricing() {
-    return window.D5Data.sourcePricing ? clone(window.D5Data.sourcePricing()) : {
-      prices: { basic: { monthly: 49, annual: 399 }, pro: { monthly: 200, annual: 1920 } },
-      monthlyCredits: 1000,
-      launchBonus: 500,
-      communityCredits: 300,
-      communityDays: 365
-    };
+    return window.D5Data.sourcePricing
+      ? clone(window.D5Data.sourcePricing())
+      : {
+          prices: { basic: { monthly: 49, annual: 399 }, pro: { monthly: 200, annual: 1920 } },
+          monthlyCredits: 1000,
+          launchBonus: 500,
+          communityCredits: 300,
+          communityDays: 365
+        };
   }
 
   function sanitizeDemoPricing(raw) {
@@ -85,7 +133,9 @@
   function validate(x, { migrate = true } = {}) {
     if (!x || typeof x !== 'object') throw Error('草稿无效');
     let schema = x.schema;
-    if (migrate && schema === 'd5-beta-editor-v1') schema = SCHEMA;
+    if (migrate && (schema === 'd5-beta-editor-v1' || schema === 'd5-beta-editor-gork-v1')) {
+      schema = SCHEMA;
+    }
     if (!LEGACY_SCHEMAS.has(x.schema) && x.schema !== SCHEMA) throw Error('草稿版本不匹配');
     if (x.dataRevision !== revision) throw Error('草稿 dataRevision 与页面不一致');
     if (!x.copy || typeof x.copy !== 'object' || Array.isArray(x.copy)) throw Error('copy 无效');
@@ -107,7 +157,9 @@
       }
       for (const [k, v] of Object.entries(x.styles)) {
         const [l, ...rest] = k.split(':');
-        if (!['zh', 'en'].includes(l) || !rest.join(':') || !v || typeof v !== 'object') throw Error('样式字段无效');
+        if (!['zh', 'en'].includes(l) || !rest.join(':') || !v || typeof v !== 'object') {
+          throw Error('样式字段无效');
+        }
         const s = {};
         for (const [p, val] of Object.entries(v)) {
           if (p === 'fontSize' && Number.isInteger(val) && val >= 10 && val <= 72) s[p] = val;
@@ -127,11 +179,15 @@
         if (typeof v === 'boolean' && /^[a-zA-Z0-9._-]{1,40}$/.test(k)) out.moduleVisibility[k] = v;
       }
     }
-    if (typeof x.membershipId === 'string' && x.membershipId.length < 40) out.membershipId = x.membershipId;
+    if (typeof x.membershipId === 'string' && x.membershipId.length < 40) {
+      out.membershipId = x.membershipId;
+    }
     return out;
   }
 
   function loadInitial() {
+    // Draft always wins over data.js / app.js defaults. load → validate keeps every
+    // existing draft.copy key; we never seed defaults into draft.copy here.
     try {
       let saved = JSON.parse(localStorage.getItem(STORE) || 'null');
       if (!saved && !boot?.draft) {
@@ -157,70 +213,223 @@
     }
   }
 
-  const SWEEP = [
-    '.hero h1', '.hero p', '.hero .beta-marker',
-    '.education-inner strong', '.education-inner span', '.education-inner a',
-    '.billing > span', '.billing-annual > span', '.billing-annual > b',
-    '.segmented [data-audience]',
-    '.plan-desc', '.plan-name h2', '.plan-button', '.product-scope', '.price-period', '.price-context',
-    '.credit-kicker', '.credit-basis', '.benefit-label', '.feature-inheritance', '.feature-storage',
-    '.capacity-label', '.generation-output', '.pool-note', '.generation-assumptions summary', '.generation-assumptions p',
-    '.plan-list li span', '.benefit-terms summary', '.benefit-terms li span', '.benefit-terms p',
-    '.section-head h2', '.section-head p', '.compare-hint', '.comparison-note',
-    '.faq-title h2', '.faq-list summary span', '.faq-list details p',
-    '.compare-head th', '.compare-group span', '.compare-row .lead', '.compare-table .lead span', '.compare-text',
-    '.launch-band-head strong', '.launch-band-head span', '.launch-band-head a',
-    '#launch-details summary', '#launch-details p', '#launch-details a',
-    '.team-intro h2', '.team-intro p', '.biz-module-head h2', '.biz-module-head p', '.biz-module-note', '.biz-module-tagline',
-    '.seat-card .plan-name h2', '.seat-card .plan-desc', '.seat-card .plan-button span', '.seat-card .product-scope',
-    '.capacity-title', '.beta-footer [data-edit-key]', '.footer-links a', '.footer-links button',
-    '.preview-top .beta-marker', '#preview-title', '.preview-demo', '.order-note', '.preview-done',
-    '.order-row dt', '.global-nav .section-nav a', '.skip-link'
-  ];
-
   function markEditable(el, key) {
-    if (!el || el.closest('#d5-editor, #d5-editor-reveal, .sr-only, script, style')) return;
+    if (!el || el.closest('#d5-editor, #d5-editor-badge, .sr-only, script, style')) return;
     if (el.matches('input, textarea, select, img, svg, path, .launch-dot')) return;
-    if (el.hasAttribute('data-demo-field')) return;
-    if (!el.dataset.editKey && !el.getAttribute('data-edit')) {
-      el.setAttribute('data-edit-key', key);
+    // Demo numeric fields use markDemoFields — keep yellow dashed + own commit path
+    if (el.hasAttribute('data-demo-field') || el.closest('[data-demo-field]')) return;
+    if (!keyOf(el)) {
+      if (el.dataset.editKey === undefined && !el.getAttribute('data-edit')) {
+        el.setAttribute('data-edit-key', key);
+      }
     }
-    const k = keyOf(el);
+    const k = keyOf(el) || key;
     if (!k) return;
-    el.setAttribute('contenteditable', editing ? 'plaintext-only' : 'false');
+    // V3 uses "true" — legacy plaintext mode breaks Safari / some WebKit
+    if (editing) {
+      el.setAttribute('contenteditable', 'true');
+      el.classList.add('editor-can-edit');
+    } else {
+      el.removeAttribute('contenteditable');
+      el.classList.remove('editor-can-edit');
+    }
     el.setAttribute('spellcheck', 'false');
-    el.classList.toggle('editor-can-edit', editing);
+  }
+
+  function markDemoFields() {
+    document.querySelectorAll('[data-demo-field]').forEach((el) => {
+      if (!el || el.closest('#d5-editor, #d5-editor-badge, .sr-only, script, style')) return;
+      if (editing) {
+        el.setAttribute('contenteditable', 'true');
+        el.classList.add('editor-can-edit', 'editor-demo-field');
+        el.title = '演示数字：框内直接修改（失焦后同步 JSON / 产能 / 订单）';
+      } else {
+        el.removeAttribute('contenteditable');
+        el.classList.remove('editor-can-edit', 'editor-demo-field');
+      }
+      el.setAttribute('spellcheck', 'false');
+    });
+  }
+
+  function parseDemoNumber(text) {
+    const cleaned = String(text || '').replace(/,/g, '');
+    const m = cleaned.match(/-?\d+(?:\.\d+)?/);
+    if (!m) return null;
+    const n = Number(m[0]);
+    return Number.isFinite(n) ? n : null;
+  }
+
+  function parseDemoNumbers(text) {
+    const cleaned = String(text || '').replace(/,/g, '');
+    return [...cleaned.matchAll(/-?\d+(?:\.\d+)?/g)].map((x) => Number(x[0])).filter((n) => Number.isFinite(n));
+  }
+
+  function commitDemoField(el) {
+    if (!editing || !el || !el.isConnected) return;
+    const field = el.getAttribute('data-demo-field');
+    if (!field) return;
+    const text = el.textContent || '';
+    const next = clone(draft.demoPricing || sourceDemoPricing());
+    try {
+      if (field.startsWith('price.')) {
+        const plan = field.slice('price.'.length);
+        if (plan === 'community') {
+          status('社区版为免费体验，价格不写入演示层');
+          applyDemoToRuntime();
+          if (typeof window.renderAll === 'function') window.renderAll();
+          else apply();
+          return;
+        }
+        if (!['basic', 'pro'].includes(plan)) {
+          status('未知价格字段：' + field);
+          return;
+        }
+        const n = parseDemoNumber(text);
+        if (n == null) {
+          status('未能解析价格数字，已恢复');
+          applyDemoToRuntime();
+          if (typeof window.renderAll === 'function') window.renderAll();
+          else apply();
+          return;
+        }
+        const billing = window.state?.billing === 'annual' ? 'annual' : 'monthly';
+        next.prices = next.prices || {};
+        next.prices[plan] = next.prices[plan] || {};
+        next.prices[plan][billing] = n;
+      } else if (field === 'communityCredits') {
+        const n = parseDemoNumber(text);
+        if (n == null) {
+          status('未能解析社区积分，已恢复');
+          applyDemoToRuntime();
+          if (typeof window.renderAll === 'function') window.renderAll();
+          else apply();
+          return;
+        }
+        next.communityCredits = Math.round(n);
+      } else if (field === 'monthlyCredits') {
+        const nums = parseDemoNumbers(text);
+        if (!nums.length) {
+          status('未能解析月积分，已恢复');
+          applyDemoToRuntime();
+          if (typeof window.renderAll === 'function') window.renderAll();
+          else apply();
+          return;
+        }
+        next.monthlyCredits = Math.round(nums[0]);
+        // If bonus is not a separate editable node, accept optional second number
+        if (nums.length >= 2 && !el.parentElement?.querySelector?.('[data-demo-field="launchBonus"]')) {
+          next.launchBonus = Math.round(nums[1]);
+        }
+      } else if (field === 'launchBonus') {
+        const n = parseDemoNumber(text);
+        if (n == null) {
+          status('未能解析赠送积分，已恢复');
+          applyDemoToRuntime();
+          if (typeof window.renderAll === 'function') window.renderAll();
+          else apply();
+          return;
+        }
+        next.launchBonus = Math.round(n);
+      } else if (field === 'communityDays') {
+        const n = parseDemoNumber(text);
+        if (n == null) {
+          status('未能解析有效天数，已恢复');
+          applyDemoToRuntime();
+          if (typeof window.renderAll === 'function') window.renderAll();
+          else apply();
+          return;
+        }
+        next.communityDays = Math.round(n);
+      } else {
+        status('未知演示字段：' + field);
+        return;
+      }
+      const sanitized = sanitizeDemoPricing(next);
+      const prev = JSON.stringify(draft.demoPricing);
+      if (JSON.stringify(sanitized) === prev) return;
+      remember();
+      draft.demoPricing = sanitized;
+      applyDemoToRuntime();
+      if (typeof window.renderAll === 'function') window.renderAll();
+      else apply();
+      changed();
+      status('演示数字已更新 · 产能/对比/订单已同步');
+      refreshJsonPanel(true);
+    } catch (err) {
+      status('演示数字无效：' + (err.message || err));
+      applyDemoToRuntime();
+      if (typeof window.renderAll === 'function') window.renderAll();
+      else apply();
+    }
   }
 
   function enableSweep() {
     if (!editing) {
       document.querySelectorAll('[contenteditable]').forEach((el) => {
-        el.setAttribute('contenteditable', 'false');
-        el.classList.remove('editor-can-edit');
+        el.removeAttribute('contenteditable');
+        el.classList.remove('editor-can-edit', 'editor-demo-field');
       });
       return;
     }
     document.querySelectorAll('[data-edit-key], [data-edit]').forEach((el) => markEditable(el, keyOf(el)));
     document.querySelectorAll('[data-i18n]').forEach((el) => markEditable(el, el.dataset.i18n));
-    document.querySelectorAll('[data-zh][data-en]').forEach((el) => {
-      if (keyOf(el)) { markEditable(el, keyOf(el)); return; }
+    document.querySelectorAll('[data-zh][data-en]').forEach((el, idx) => {
+      if (keyOf(el)) {
+        markEditable(el, keyOf(el));
+        return;
+      }
       const guess = (el.className || el.tagName || 'node').toString().replace(/\s+/g, '.').slice(0, 40);
-      markEditable(el, 'i18n.' + guess + '.' + Math.abs(hash(el.textContent || guess) % 10000));
+      // Unique per node — never share one i18n.* key across cards/columns
+      markEditable(el, 'i18n.' + guess + '.' + idx);
     });
     let autoIdx = 0;
     document.querySelectorAll(SWEEP.join(',')).forEach((el) => {
-      if (keyOf(el)) { markEditable(el, keyOf(el)); return; }
-      if (el.dataset.i18n) { markEditable(el, el.dataset.i18n); return; }
-      const key = el.getAttribute('data-edit-auto') || `auto.${(el.className || el.tagName || 'node').toString().replace(/\s+/g, '.').slice(0, 40)}.${autoIdx++}`;
+      if (keyOf(el)) {
+        markEditable(el, keyOf(el));
+        return;
+      }
+      if (el.dataset.i18n) {
+        markEditable(el, el.dataset.i18n);
+        return;
+      }
+      const key =
+        el.getAttribute('data-edit-auto') ||
+        `auto.${(el.className || el.tagName || 'node').toString().replace(/\s+/g, '.').slice(0, 40)}.${autoIdx++}`;
       el.setAttribute('data-edit-auto', key);
       markEditable(el, key);
     });
+    markDemoFields();
   }
 
-  function hash(s) {
-    let h = 0;
-    for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) | 0;
-    return h;
+  function ensureBase(e, id) {
+    if (fields.has(id)) return fields.get(id);
+    const source = e.dataset[lang()];
+    const base = { text: source ?? e.textContent, style: '' };
+    fields.set(id, base);
+    return base;
+  }
+
+  function applyCopyStyles() {
+    // HARD RULE: draft.copy[id] always overrides DOM defaults from data.js/app.js.
+    // Never delete or replace an existing draft key with a default string here.
+    applyingDom = true;
+    try {
+      document.querySelectorAll('[data-edit-key], [data-edit], [data-edit-auto]').forEach((e) => {
+        if (e.hasAttribute('data-demo-field')) return;
+        const key = keyOf(e);
+        if (!key) return;
+        const id = lang() + ':' + key;
+        ensureBase(e, id);
+        if (Object.prototype.hasOwnProperty.call(draft.copy, id)) e.textContent = draft.copy[id];
+        for (const [p, val] of Object.entries(draft.styles[id] || {})) {
+          if (p === 'fontSize') e.style.fontSize = val + 'px';
+          else if (p === 'paddingTop') e.style.paddingTop = val + 'px';
+          else e.style[p] = val;
+        }
+      });
+    } finally {
+      applyingDom = false;
+    }
   }
 
   function applyModuleVisibility() {
@@ -243,42 +452,13 @@
     }
   }
 
-  function ensureBase(e, id) {
-    if (fields.has(id)) return fields.get(id);
-    const source = e.dataset[lang()];
-    const base = {
-      text: source ?? e.textContent,
-      html: source !== undefined ? null : null,
-      style: ''
-    };
-    fields.set(id, base);
-    return base;
-  }
-  function applyCopyStyles() {
-    // Fresh render wins for untouched keys; only overlay draft.copy / draft.styles.
-    document.querySelectorAll('[data-edit-key], [data-edit], [data-edit-auto]').forEach((e) => {
-      if (e.hasAttribute('data-demo-field')) return;
-      const key = keyOf(e);
-      if (!key) return;
-      const id = lang() + ':' + key;
-      ensureBase(e, id);
-      if (Object.prototype.hasOwnProperty.call(draft.copy, id)) e.textContent = draft.copy[id];
-      for (const [p, val] of Object.entries(draft.styles[id] || {})) {
-        if (p === 'fontSize') e.style.fontSize = val + 'px';
-        else if (p === 'paddingTop') e.style.paddingTop = val + 'px';
-        else e.style[p] = val;
-      }
-    });
-  }
-
   function apply() {
     applyDemoToRuntime();
     applyModuleVisibility();
     applyCopyStyles();
     enableSweep();
     if (bundle) {
-      document.querySelectorAll('a[href="topup.html"],a[href^="http://127.0.0.1"],a[href^="http://localhost"]').forEach((a) => {
-        if (!/topup\.html/.test(a.getAttribute('href') || '') && !a.dataset.onlineOnly) return;
+      document.querySelectorAll('a[href="topup.html"]').forEach((a) => {
         a.dataset.onlineOnly = 'topup';
         a.setAttribute('href', '#');
         a.setAttribute('aria-disabled', 'true');
@@ -288,6 +468,7 @@
     if (typeof window.alignCardSections === 'function') window.alignCardSections();
     controls();
     refreshJsonPanel(false);
+    syncModeUi();
   }
 
   function remember() {
@@ -297,8 +478,11 @@
   }
 
   function status(message) {
-    bar.querySelector('.editor-status').textContent =
-      message || storageError || (dirty ? '修改中 · 未保存' : '草稿已保存于本机');
+    const el = bar.querySelector('.editor-status');
+    if (el) {
+      el.textContent =
+        message || storageError || (dirty ? '修改中 · 未保存' : '草稿已保存于本机');
+    }
   }
 
   function save() {
@@ -324,26 +508,48 @@
   }
 
   function controls() {
-    bar.querySelector('[data-editor=undo]').disabled = !undo.length;
-    bar.querySelector('[data-editor=redo]').disabled = !redo.length;
+    const u = bar.querySelector('[data-editor=undo]');
+    const r = bar.querySelector('[data-editor=redo]');
+    if (u) u.disabled = !undo.length;
+    if (r) r.disabled = !redo.length;
+  }
+
+  function syncModeUi() {
+    const btn = bar.querySelector('[data-editor=mode]');
+    if (btn) {
+      btn.textContent = editing ? '✓ 完成编辑' : '编辑模式';
+      btn.classList.toggle('on', editing);
+      btn.classList.toggle('editor-primary', true);
+    }
+    const fmt = bar.querySelector('.editor-format');
+    const mods = bar.querySelector('.editor-modules');
+    if (fmt) fmt.hidden = !editing;
+    if (mods) mods.hidden = !editing;
+    if (badge) badge.hidden = !editing;
+    document.body.classList.toggle('d5-editing', editing);
+    document.body.classList.toggle('editing', editing);
   }
 
   function setMode(on) {
     editing = !!on;
     selected = null;
-    document.body.classList.toggle('d5-editing', editing);
-    document.body.classList.toggle('editing', editing);
-    bar.querySelector('[data-editor=mode]').textContent = editing ? '✓ 完成编辑' : '✎ 编辑页面';
-    bar.querySelector('.editor-format').hidden = !editing;
-    bar.querySelector('.editor-modules').hidden = !editing;
     apply();
-    status(editing ? '编辑中 · 点虚线文案直接修改；价格数字用「价格 / JSON」' : '预览中 · 修改保留');
+    status(
+      editing
+        ? '编辑中 · 点虚线直接改；数字也可框内改'
+        : '预览中 · 修改已保留'
+    );
   }
 
   function commit(e) {
+    if (applyingDom) return; // do not persist defaults painted by renderAll before draft re-apply
     if (!editing || !e || !e.isConnected) return;
-    if (!e.matches('[data-edit-key], [data-edit], [data-edit-auto]')) return;
-    if (e.hasAttribute('data-demo-field')) return;
+    const demoEl = e.closest?.('[data-demo-field]') || (e.hasAttribute?.('data-demo-field') ? e : null);
+    if (demoEl) {
+      commitDemoField(demoEl);
+      return;
+    }
+    if (!e.matches?.('[data-edit-key], [data-edit], [data-edit-auto]')) return;
     const key = keyOf(e);
     if (!key) return;
     const id = lang() + ':' + key;
@@ -352,34 +558,54 @@
     if (value === prev) return;
     remember();
     draft.copy[id] = value;
+    const planCard = e.closest?.('[data-plan-card]')?.getAttribute('data-plan-card') || null;
     document.querySelectorAll('[data-edit-key], [data-edit], [data-edit-auto]').forEach((other) => {
-      if (other !== e && keyOf(other) === key) other.textContent = value;
+      if (other === e || keyOf(other) !== key) return;
+      const otherPlan = other.closest?.('[data-plan-card]')?.getAttribute('data-plan-card') || null;
+      // Never mirror edits across different plan cards (community/basic/pro).
+      // Same key on card + compare header for the SAME plan is still synced.
+      if (planCard && otherPlan && planCard !== otherPlan) return;
+      if (planCard && !otherPlan) {
+        // page-level twin (e.g. compare header): only sync if key encodes this plan
+        if (key.startsWith('plan.') && !key.startsWith('plan.' + planCard + '.')) return;
+      }
+      if (!planCard && otherPlan) {
+        if (key.startsWith('plan.') && !key.startsWith('plan.' + otherPlan + '.')) return;
+      }
+      other.textContent = value;
     });
     changed();
   }
 
   function selectField(e) {
-    const demo = e.target.closest('[data-demo-field]');
-    if (editing && demo) {
-      openJsonPanel(true);
-      status('演示数字请在「价格 / JSON」面板修改，保证订单一致');
+    if (!editing) return;
+    const demo = e.target.closest?.('[data-demo-field]');
+    if (demo) {
+      selected = demo;
+      const label = bar.querySelector('.editor-selected');
+      if (label) label.textContent = demo.getAttribute('data-demo-field') || '';
       return;
     }
-    const el = e.target.closest('[data-edit-key], [data-edit], [data-edit-auto]');
-    if (!editing || !el || el.hasAttribute('data-demo-field')) return;
+    const el = e.target.closest?.('[data-edit-key], [data-edit], [data-edit-auto]');
+    if (!el) return;
     selected = el;
+    const label = bar.querySelector('.editor-selected');
+    if (label) label.textContent = keyOf(el) || '';
     const cs = getComputedStyle(el);
-    bar.querySelector('.editor-selected').textContent = keyOf(el) || '';
     const rgb = cs.color.match(/\d+/g);
-    if (rgb?.length >= 3) {
-      bar.querySelector('[data-format=color]').value =
+    const color = bar.querySelector('[data-format=color]');
+    if (color && rgb?.length >= 3) {
+      color.value =
         '#' + rgb.slice(0, 3).map((n) => Number(n).toString(16).padStart(2, '0')).join('');
     }
-    bar.querySelector('[data-format=fontSize]').value = Math.round(parseFloat(cs.fontSize));
-    bar.querySelector('[data-format=textAlign]').value =
-      ['left', 'center', 'right'].includes(cs.textAlign) ? cs.textAlign : 'left';
-    const pad = Math.round(parseFloat(cs.paddingTop)) || 0;
-    bar.querySelector('[data-format=paddingTop]').value = pad;
+    const fs = bar.querySelector('[data-format=fontSize]');
+    if (fs) fs.value = Math.round(parseFloat(cs.fontSize));
+    const ta = bar.querySelector('[data-format=textAlign]');
+    if (ta) {
+      ta.value = ['left', 'center', 'right'].includes(cs.textAlign) ? cs.textAlign : 'left';
+    }
+    const pad = bar.querySelector('[data-format=paddingTop]');
+    if (pad) pad.value = Math.round(parseFloat(cs.paddingTop)) || 0;
   }
 
   function payload() {
@@ -400,7 +626,7 @@
     return {
       schema: SCHEMA,
       dataRevision: revision,
-      note: '改 demoPricing 后点「应用」；卡片价/对比表/订单同源。copy 为按 lang:key 的文案覆盖。',
+      note: '黄框可框内改价/积分（失焦同步）；也可在此改 demoPricing 后点「应用」。copy 为 lang:key 文案覆盖。',
       demoPricing: draft.demoPricing || sourceDemoPricing(),
       membershipId: draft.membershipId,
       moduleVisibility: draft.moduleVisibility,
@@ -419,8 +645,11 @@
   function openJsonPanel(open) {
     const panel = bar.querySelector('.edit-json-panel');
     if (!panel) return;
-    panel.hidden = open === false ? true : open === true ? false : !panel.hidden;
-    if (!panel.hidden) refreshJsonPanel(true);
+    const show = open === false ? false : open === true ? true : panel.hidden;
+    // when toggling: panel.hidden true → show true; when open: show true
+    panel.hidden = !show;
+    panel.classList.toggle('open', !panel.hidden);
+    if (show) refreshJsonPanel(true);
   }
 
   function applyJsonPanel() {
@@ -438,7 +667,9 @@
       if (Object.prototype.hasOwnProperty.call(data, 'demoPricing')) {
         draft.demoPricing = sanitizeDemoPricing(data.demoPricing);
       }
-      if (data.moduleVisibility) draft.moduleVisibility = { ...draft.moduleVisibility, ...data.moduleVisibility };
+      if (data.moduleVisibility) {
+        draft.moduleVisibility = { ...draft.moduleVisibility, ...data.moduleVisibility };
+      }
       if (typeof data.membershipId === 'string') draft.membershipId = data.membershipId;
       draft = validate(draft);
       applyDemoToRuntime();
@@ -467,7 +698,9 @@
     }
     const assets = {};
     const strings = [html, ...Object.values(texts)].join('\n');
-    const names = new Set([...strings.matchAll(/assets\/[a-zA-Z0-9_./-]+\.(?:svg|png|webp|jpe?g)/g)].map((m) => m[0]));
+    const names = new Set(
+      [...strings.matchAll(/assets\/[a-zA-Z0-9_./-]+\.(?:svg|png|webp|jpe?g)/g)].map((m) => m[0])
+    );
     for (const ref of names) {
       const r = await fetch(ref);
       if (!r.ok) throw Error('图片读取失败：' + ref);
@@ -510,7 +743,6 @@
         }
       }
     }
-    // Offline boot: draft + view only. Never embed cloud edit/view tokens.
     const bootPayload = {
       id: Date.now().toString(36),
       draft: draftCopy,
@@ -518,15 +750,13 @@
     };
     const meta = doc.createElement('script');
     meta.textContent = scriptSafe(
-      'window.D5_OFFLINE_BUNDLE=' + JSON.stringify(b) +
-      ';window.D5_EDITOR_BOOT=' + JSON.stringify(bootPayload) +
-      ';window.D5_CLOUD_API=undefined;try{sessionStorage.removeItem("d5-cloud-session-v1")}catch(e){}'
+      'window.D5_OFFLINE_BUNDLE=' +
+        JSON.stringify(b) +
+        ';window.D5_EDITOR_BOOT=' +
+        JSON.stringify(bootPayload) +
+        ';window.D5_CLOUD_API=undefined;try{sessionStorage.removeItem("d5-cloud-session-v1")}catch(e){}'
     );
     doc.head.prepend(meta);
-    for (const a of doc.querySelectorAll('a[href="topup.html"]')) {
-      a.setAttribute('href', new URL('topup.html', location.protocol === 'file:' ? 'http://127.0.0.1:8768/' : location.href).href);
-      a.setAttribute('title', '独立充值页仅在本机预览可用');
-    }
     return '<!doctype html>\n' + doc.documentElement.outerHTML;
   }
 
@@ -546,7 +776,6 @@
   function importDraft(text) {
     if (typeof text !== 'string' || text.length > 2e6) throw Error('草稿文件过大');
     const parsed = JSON.parse(text);
-    // Accept V4-ish payload with copyOverrides / tiers → map into our schema
     let next;
     if (parsed.copyOverrides || parsed.tiers || parsed.demoPricing || parsed.copy) {
       if (parsed.schema || parsed.copy) {
@@ -560,11 +789,10 @@
           membershipId: parsed.membershipId || 'community'
         });
       } else {
-        // Loose V4 import: copyOverrides keys without lang prefix → apply to current lang
         const copy = {};
         if (parsed.copyOverrides) {
           for (const [k, v] of Object.entries(parsed.copyOverrides)) {
-            const str = typeof v === 'string' ? v : (v?.[lang()] || v?.zh || v?.en || '');
+            const str = typeof v === 'string' ? v : v?.[lang()] || v?.zh || v?.en || '';
             if (str) copy[lang() + ':' + k] = String(str).slice(0, 8000);
           }
         }
@@ -573,8 +801,14 @@
           const t = parsed.tiers[0];
           demoPricing = {
             prices: {
-              basic: { monthly: t.prices?.basic?.monthly ?? 49, annual: t.prices?.basic?.annual ?? 399 },
-              pro: { monthly: t.prices?.pro?.monthly ?? 200, annual: t.prices?.pro?.annual ?? 1920 }
+              basic: {
+                monthly: t.prices?.basic?.monthly ?? 49,
+                annual: t.prices?.basic?.annual ?? 399
+              },
+              pro: {
+                monthly: t.prices?.pro?.monthly ?? 200,
+                annual: t.prices?.pro?.annual ?? 1920
+              }
             },
             monthlyCredits: t.monthlyCredits ?? 1000,
             launchBonus: Math.round((t.monthlyCredits ?? 1000) * 0.5),
@@ -604,28 +838,39 @@
     return true;
   }
 
-  // ---- UI ----
-  const bar = document.createElement('aside');
-  bar.id = 'd5-editor';
-  bar.setAttribute('aria-label', '页面编辑工具');
-  bar.innerHTML = `
-    <div class="editor-main">
-      <button type="button" data-editor="mode" class="editor-primary">✎ 编辑页面</button>
-      <span class="editor-status" role="status"></span>
-      <button type="button" data-editor="undo" title="撤销">↶</button>
-      <button type="button" data-editor="redo" title="重做">↷</button>
-      <button type="button" data-editor="save">保存草稿</button>
-      <button type="button" data-editor="json-panel">价格 / JSON</button>
-      <button type="button" data-editor="html">导出 HTML</button>
-      <button type="button" data-editor="more" aria-expanded="false">更多 ⋯</button>
-      <button type="button" data-editor="collapse" title="收起编辑工具">⌄</button>
+  // ---- Toolbar: prefer static HTML; fallback create ----
+  let bar = document.getElementById('d5-editor');
+  if (!bar) {
+    bar = document.createElement('aside');
+    bar.id = 'd5-editor';
+    bar.className = 'demo-toolbar';
+    bar.setAttribute('aria-label', '演示与编辑工具栏');
+    document.body.prepend(bar);
+  }
+  bar.classList.add('demo-toolbar');
+  bar.setAttribute('aria-label', bar.getAttribute('aria-label') || '演示与编辑工具栏');
+
+  if (!bar.querySelector('.editor-main')) {
+    bar.innerHTML = `
+    <div class="editor-main demo-toolbar-inner">
+      <div class="tb-group">
+        <span class="tb-label">页面编辑</span>
+        <button type="button" data-editor="mode" class="editor-primary tb-btn">编辑模式</button>
+        <button type="button" data-editor="undo" class="tb-btn" title="撤销">↶</button>
+        <button type="button" data-editor="redo" class="tb-btn" title="重做">↷</button>
+        <button type="button" data-editor="save" class="tb-btn">保存草稿</button>
+        <button type="button" data-editor="json-panel" class="tb-btn">价格 / JSON</button>
+        <button type="button" data-editor="json" class="tb-btn">导出 JSON</button>
+        <button type="button" data-editor="import" class="tb-btn">导入 JSON</button>
+        <button type="button" data-editor="html" class="tb-btn">导出 HTML</button>
+        <button type="button" data-editor="reset" class="tb-btn warn">重置</button>
+        <button type="button" data-editor="more" class="tb-btn" aria-expanded="false">更多 ⋯</button>
+      </div>
+      <span class="editor-status tb-hint" role="status">预览中 · 点「编辑模式」改文案</span>
     </div>
     <div class="editor-more" hidden>
-      <button type="button" data-editor="json">导出草稿 JSON</button>
-      <button type="button" data-editor="import">导入草稿</button>
-      <button type="button" data-editor="import-legacy">导入旧 Beta 草稿</button>
-      <button type="button" data-editor="reset">恢复原稿</button>
-      <span>HTML 支持离线查看与再编辑；教育官网需联网；独立充值页仅在本机预览可用。</span>
+      <button type="button" data-editor="import-legacy" class="tb-btn">导入旧 Beta 草稿</button>
+      <span class="editor-help">HTML 可离线再编辑；教育官网需联网；充值页仅本机预览。</span>
     </div>
     <div class="editor-format" hidden>
       <span class="editor-selected">点选文案调整样式</span>
@@ -633,7 +878,7 @@
       <label>颜色 <input type="color" data-format="color" aria-label="颜色"></label>
       <label>对齐 <select data-format="textAlign" aria-label="对齐"><option value="left">左</option><option value="center">中</option><option value="right">右</option></select></label>
       <label>上间距 <input type="number" min="0" max="120" data-format="paddingTop" aria-label="上间距"></label>
-      <span class="editor-help">虚线可直接改 · 价格/积分离开「价格 / JSON」面板 · 改后订单同源</span>
+      <span class="editor-help">虚线可直接改 · 价格数字走「价格 / JSON」</span>
     </div>
     <div class="editor-modules" hidden>
       <span class="editor-help">模块显隐</span>
@@ -645,64 +890,84 @@
       <label><input type="checkbox" data-module-toggle="footer" checked> 页脚</label>
     </div>
     <div class="edit-json-panel" hidden>
-      <label for="edit-json-text">演示价格 / 积分 + 文案覆盖（改数字后点应用，卡片·对比表·订单同源）</label>
-      <textarea id="edit-json-text" spellcheck="false" rows="12"></textarea>
-      <div class="edit-json-actions">
-        <button type="button" class="editor-primary" data-editor="apply-json">应用</button>
-        <button type="button" data-editor="refresh-json">刷新面板</button>
-        <button type="button" data-editor="clear-demo">清除演示价（回源）</button>
-        <span id="edit-json-msg" class="edit-json-msg"></span>
+      <div class="wrap">
+        <label for="edit-json-text">演示价格 / 积分 + 文案覆盖（改数字后点应用）</label>
+        <textarea id="edit-json-text" spellcheck="false" rows="12"></textarea>
+        <div class="edit-json-actions">
+          <button type="button" class="editor-primary tb-btn" data-editor="apply-json">应用</button>
+          <button type="button" class="tb-btn" data-editor="refresh-json">刷新面板</button>
+          <button type="button" class="tb-btn" data-editor="clear-demo">清除演示价（回源）</button>
+          <span id="edit-json-msg" class="edit-json-msg"></span>
+        </div>
       </div>
     </div>
     <input type="file" accept="application/json,.json" hidden data-import-file>`;
-
-  document.body.append(bar);
-  const reveal = document.createElement('button');
-  reveal.id = 'd5-editor-reveal';
-  reveal.textContent = '✎ 编辑页面';
-  reveal.hidden = true;
-  document.body.append(reveal);
-  reveal.onclick = () => { bar.hidden = false; reveal.hidden = true; };
+  }
 
   const badge = document.createElement('div');
   badge.id = 'd5-editor-badge';
   badge.hidden = true;
-  badge.textContent = '编辑中 · 草稿';
+  badge.textContent = '编辑中 · 草稿自动保存';
   document.body.append(badge);
 
   loadInitial();
   if (typeof window.renderAll === 'function') window.renderAll();
 
+  // Capture: in edit mode, clicking editable text must not fire CTAs (incl. plan-button)
+  document.addEventListener(
+    'click',
+    (e) => {
+      if (e.target.closest('[data-online-only]')) {
+        e.preventDefault();
+        status('独立充值页需本机预览服务');
+        return;
+      }
+      if (!editing) return;
+      if (e.target.closest('#d5-editor')) return;
+
+      const editable = e.target.closest('[contenteditable="true"], [data-demo-field]');
+      if (editable) {
+        // V3 pattern: block buy / preview / nav while editing this text
+        e.stopPropagation();
+        if (e.target.closest('a[href], summary')) e.preventDefault();
+        // Also block plan-button preview when the button itself is contenteditable
+        if (editable.matches('[data-preview-plan], [data-contact-sales]')) e.preventDefault();
+        return;
+      }
+    },
+    true
+  );
+
   document.addEventListener('focusin', selectField);
   document.addEventListener('pointerdown', selectField);
-  document.addEventListener('click', selectField, true);
+
   document.addEventListener('focusout', (e) => {
     commit(e.target);
     if (editing && typeof window.alignCardSections === 'function') window.alignCardSections();
   });
+
   document.addEventListener('input', (e) => {
-    if (editing && e.target.matches('[data-edit-key], [data-edit], [data-edit-auto]')) commit(e.target);
+    if (!editing) return;
+    // Demo numbers commit on blur only — input+renderAll would steal focus
+    if (e.target.closest?.('[data-demo-field]')) return;
+    if (e.target.matches?.('[data-edit-key], [data-edit], [data-edit-auto]')) {
+      commit(e.target);
+    }
   });
+
   document.addEventListener('paste', (e) => {
-    if (!editing || !e.target.matches('[data-edit-key], [data-edit], [data-edit-auto]')) return;
-    e.preventDefault();
-    document.execCommand('insertText', false, (e.clipboardData?.getData('text/plain') || '').slice(0, 8000));
-  });
-  document.addEventListener('click', (e) => {
-    if (e.target.closest('[data-online-only]')) {
-      e.preventDefault();
-      status('独立充值页需本机预览服务；本文件可离线查看和编辑');
+    if (!editing) return;
+    const t = e.target;
+    if (
+      !t.matches?.('[data-edit-key], [data-edit], [data-edit-auto], [data-demo-field]') &&
+      !t.closest?.('[data-demo-field]')
+    ) {
       return;
     }
-    if (!editing) return;
-    // Keep real product actions usable in edit mode (order preview / audience / billing / FAQ toggles).
-    if (e.target.closest('[data-preview-plan],[data-contact-sales],[data-close-preview],[data-billing-toggle],[data-lang],[data-audience],[data-toggle-group],[data-export],.language-switch,.audience-switch')) return;
-    if (e.target.closest('[data-demo-field]')) return;
-    if (e.target.closest('[data-edit-key], [data-edit], [data-edit-auto]')) {
-      if (e.target.closest('a[href],summary')) e.preventDefault();
-      e.stopImmediatePropagation();
-    }
-  }, true);
+    e.preventDefault();
+    const plain = (e.clipboardData?.getData('text/plain') || '').slice(0, 8000);
+    document.execCommand('insertText', false, plain);
+  });
 
   bar.addEventListener('change', (e) => {
     const mod = e.target.dataset.moduleToggle;
@@ -719,18 +984,22 @@
     remember();
     const id = idFor(selected);
     draft.styles[id] ??= {};
-    if (p === 'fontSize') draft.styles[id][p] = Math.round(Math.max(10, Math.min(72, Number(e.target.value) || 16)));
-    else if (p === 'paddingTop') draft.styles[id][p] = Math.round(Math.max(0, Math.min(120, Number(e.target.value) || 0)));
-    else draft.styles[id][p] = e.target.value;
+    if (p === 'fontSize') {
+      draft.styles[id][p] = Math.round(Math.max(10, Math.min(72, Number(e.target.value) || 16)));
+    } else if (p === 'paddingTop') {
+      draft.styles[id][p] = Math.round(Math.max(0, Math.min(120, Number(e.target.value) || 0)));
+    } else {
+      draft.styles[id][p] = e.target.value;
+    }
     applyCopyStyles();
     changed();
   });
 
+  // Re-attach after every card rebuild
   document.addEventListener('d5:render', () => {
     selected = null;
     fields.clear();
     apply();
-    badge.hidden = !editing;
   });
 
   bar.addEventListener('click', async (e) => {
@@ -739,7 +1008,6 @@
     commit(document.activeElement);
     if (action === 'mode') {
       setMode(!editing);
-      badge.hidden = !editing;
     } else if (action === 'save') save();
     else if (action === 'undo' && undo.length) {
       redo.push(clone(draft));
@@ -756,19 +1024,35 @@
       else apply();
       changed();
     } else if (action === 'json') {
-      download('D5-Beta-editor-gork-draft.json', JSON.stringify(payload(), null, 2), 'application/json');
+      download(
+        'D5-Beta-editor-gork-draft.json',
+        JSON.stringify(payload(), null, 2),
+        'application/json'
+      );
       status('草稿已导出');
     } else if (action === 'html') {
-      try { await exportHtml(); } catch (err) { console.error(err); }
-    } else if (action === 'import') bar.querySelector('[data-import-file]').click();
+      try {
+        await exportHtml();
+      } catch (err) {
+        console.error(err);
+      }
+    } else if (action === 'import') bar.querySelector('[data-import-file]')?.click();
     else if (action === 'import-legacy') {
       try {
         const legacy = localStorage.getItem(LEGACY_STORE);
-        if (!legacy) { status('未找到旧草稿 ' + LEGACY_STORE); return; }
+        if (!legacy) {
+          status('未找到旧草稿 ' + LEGACY_STORE);
+          return;
+        }
         importDraft(legacy);
         status('已导入旧 Beta 草稿');
-      } catch (err) { status('导入旧草稿失败：' + err.message); }
-    } else if (action === 'reset' && confirm('恢复原稿？当前文案、样式与演示价格将清空，可先导出草稿。')) {
+      } catch (err) {
+        status('导入旧草稿失败：' + err.message);
+      }
+    } else if (
+      action === 'reset' &&
+      confirm('恢复原稿？当前文案、样式与演示价格将清空，可先导出草稿。')
+    ) {
       remember();
       draft = emptyDraft();
       applyDemoToRuntime();
@@ -777,13 +1061,10 @@
       changed();
     } else if (action === 'more') {
       const m = bar.querySelector('.editor-more');
-      m.hidden = !m.hidden;
-      e.target.setAttribute('aria-expanded', String(!m.hidden));
-    } else if (action === 'collapse') {
-      setMode(false);
-      badge.hidden = true;
-      bar.hidden = true;
-      reveal.hidden = false;
+      if (m) {
+        m.hidden = !m.hidden;
+        e.target.closest('[data-editor]')?.setAttribute('aria-expanded', String(!m.hidden));
+      }
     } else if (action === 'json-panel') openJsonPanel();
     else if (action === 'apply-json') applyJsonPanel();
     else if (action === 'refresh-json') refreshJsonPanel(true);
@@ -800,8 +1081,8 @@
     }
   });
 
-  bar.querySelector('[data-import-file]').onchange = async (e) => {
-    const f = e.target.files[0];
+  bar.querySelector('[data-import-file]')?.addEventListener('change', async (e) => {
+    const f = e.target.files?.[0];
     if (!f) return;
     try {
       if (f.size > 2e6) throw Error('文件超过 2MB');
@@ -811,7 +1092,7 @@
       status('导入失败：' + err.message);
     }
     e.target.value = '';
-  };
+  });
 
   document.addEventListener('keydown', (e) => {
     if (editing && (e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 's') {
@@ -821,9 +1102,9 @@
     }
     if (e.key === 'Escape' && editing) {
       commit(document.activeElement);
-      if (!bar.querySelector('.edit-json-panel')?.hidden) openJsonPanel(false);
+      const panel = bar.querySelector('.edit-json-panel');
+      if (panel && !panel.hidden) openJsonPanel(false);
       else setMode(false);
-      badge.hidden = true;
     }
   });
 
@@ -851,9 +1132,12 @@
     setStatus: status,
     storageKey: STORE,
     schema: SCHEMA,
-    applyDemoPricing: window.applyDemoPricing
+    applyDemoPricing: window.applyDemoPricing,
+    isEditing: () => editing,
+    getSweepSelectors: () => SWEEP.slice()
   });
 
   apply();
-  status(boot ? '离线副本 · 修改可继续导出' : storageError || '预览中 · 点击编辑页面（V3/V4 级自由度）');
+  if (DEFAULT_EDIT_ON) setMode(true);
+  else status(boot ? '离线副本 · 修改可继续导出' : storageError || '预览中 · 顶部点「编辑模式」开始改文案');
 })();

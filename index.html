@@ -8,11 +8,64 @@
   <meta name="description" content="D5 首发方案：基础版与专业版每月 1000 基础积分，首发合资格批次加赠 500。">
   <title>D5 · 首发方案 Beta</title>
   <link rel="icon" href="assets/d5-logo.png">
-  <link rel="stylesheet" href="styles.css?v=202611-beta-1">
-  <link rel="stylesheet" href="beta.css?v=202611-beta-gork-1">
-  <link rel="stylesheet" href="editor.css?v=202611-beta-gork-cloud-1">
+  <link rel="stylesheet" href="styles.css?v=20261015-xianzhi-zengsong">
+  <link rel="stylesheet" href="beta.css?v=20261015-xianzhi-zengsong">
+  <link rel="stylesheet" href="editor.css?v=20261015-xianzhi-zengsong">
 </head>
 <body data-page="pricing">
+  <aside class="demo-toolbar" id="d5-editor" aria-label="演示与编辑工具栏">
+    <div class="editor-main demo-toolbar-inner">
+      <div class="tb-group">
+        <span class="tb-label">页面编辑</span>
+        <button type="button" data-editor="mode" class="editor-primary tb-btn">编辑模式</button>
+        <button type="button" data-editor="undo" class="tb-btn" title="撤销">↶</button>
+        <button type="button" data-editor="redo" class="tb-btn" title="重做">↷</button>
+        <button type="button" data-editor="save" class="tb-btn">保存草稿</button>
+        <button type="button" data-editor="json-panel" class="tb-btn">价格 / JSON</button>
+        <button type="button" data-editor="json" class="tb-btn">导出 JSON</button>
+        <button type="button" data-editor="import" class="tb-btn">导入 JSON</button>
+        <button type="button" data-editor="html" class="tb-btn">导出 HTML</button>
+        <button type="button" data-editor="reset" class="tb-btn warn">重置</button>
+        <button type="button" data-editor="more" class="tb-btn" aria-expanded="false">更多 ⋯</button>
+      </div>
+      <span class="editor-status tb-hint" role="status">预览中 · 点「编辑模式」改文案</span>
+    </div>
+    <div class="editor-more" hidden>
+      <button type="button" data-editor="import-legacy" class="tb-btn">导入旧 Beta 草稿</button>
+      <span class="editor-help">HTML 可离线再编辑；教育官网需联网；充值页仅本机预览。</span>
+    </div>
+    <div class="editor-format" hidden>
+      <span class="editor-selected">点选文案调整样式</span>
+      <label>字号 <input type="number" min="10" max="72" data-format="fontSize" aria-label="字号"></label>
+      <label>颜色 <input type="color" data-format="color" aria-label="颜色"></label>
+      <label>对齐 <select data-format="textAlign" aria-label="对齐"><option value="left">左</option><option value="center">中</option><option value="right">右</option></select></label>
+      <label>上间距 <input type="number" min="0" max="120" data-format="paddingTop" aria-label="上间距"></label>
+      <span class="editor-help">虚线可直接改 · 价格数字走「价格 / JSON」</span>
+    </div>
+    <div class="editor-modules" hidden>
+      <span class="editor-help">模块显隐</span>
+      <label><input type="checkbox" data-module-toggle="hero" checked> Hero</label>
+      <label><input type="checkbox" data-module-toggle="launchBand" checked> 首发短带</label>
+      <label><input type="checkbox" data-module-toggle="education" checked> 学生条</label>
+      <label><input type="checkbox" data-module-toggle="comparison" checked> 对比表</label>
+      <label><input type="checkbox" data-module-toggle="faq" checked> FAQ</label>
+      <label><input type="checkbox" data-module-toggle="footer" checked> 页脚</label>
+    </div>
+    <div class="edit-json-panel" hidden>
+      <div class="wrap">
+        <label for="edit-json-text">演示价格 / 积分 + 文案覆盖（改数字后点应用）</label>
+        <textarea id="edit-json-text" spellcheck="false" rows="12"></textarea>
+        <div class="edit-json-actions">
+          <button type="button" class="editor-primary tb-btn" data-editor="apply-json">应用</button>
+          <button type="button" class="tb-btn" data-editor="refresh-json">刷新面板</button>
+          <button type="button" class="tb-btn" data-editor="clear-demo">清除演示价（回源）</button>
+          <span id="edit-json-msg" class="edit-json-msg"></span>
+        </div>
+      </div>
+    </div>
+    <input type="file" accept="application/json,.json" hidden data-import-file>
+  </aside>
+
   <a class="skip-link" href="#main" data-zh="跳至主要内容" data-en="Skip to content">跳至主要内容</a>
   <header class="global-nav">
     <a class="brand" href="#pricing" aria-label="D5"><img src="assets/brand.webp" alt=""><span>D5</span></a>
@@ -63,12 +116,12 @@
   <footer class="beta-footer" data-module="footer"><a class="brand" href="#pricing"><span>D5</span></a><span data-edit-key="footer.tagline" data-zh="让创作走得更远" data-en="Take your creativity further"></span><div class="footer-links"><a href="topup.html" data-zh="积分充值" data-en="Credit top-ups"></a><button type="button" data-export data-zh="导出方案数据" data-en="Export plan data"></button></div></footer>
   <dialog id="order-preview" aria-labelledby="preview-title" aria-describedby="preview-demo"><div id="preview-content"></div></dialog>
   <div class="sr-only" id="announcer" role="status" aria-live="polite"></div>
-  <script src="data.js?v=202611-beta-gork-1"></script>
-  <script src="i18n-sync.js?v=202611-beta-1"></script>
-  <script src="business.js?v=202611-beta-gork-1"></script>
-  <script src="app.js?v=202611-beta-gork-1"></script>
-  <script src="flows.js?v=202611-beta-gork-1"></script>
-  <script src="editor.js?v=202611-beta-gork-cloud-1"></script>
-  <script src="cloud-sync.js?v=202611-beta-gork-cloud-1"></script>
+  <script src="data.js?v=20261015-xianzhi-zengsong"></script>
+  <script src="i18n-sync.js?v=20261015-xianzhi-zengsong"></script>
+  <script src="business.js?v=20261015-xianzhi-zengsong"></script>
+  <script src="app.js?v=20261015-xianzhi-zengsong"></script>
+  <script src="flows.js?v=20261015-xianzhi-zengsong"></script>
+  <script src="editor.js?v=20261015-xianzhi-zengsong"></script>
+  <script src="cloud-sync.js?v=20261015-xianzhi-zengsong"></script>
 </body>
 </html>

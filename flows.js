@@ -28,11 +28,28 @@
     const est=D.outputEstimate(o.batch.total);
     show(q('确认你的方案','Review your plan'),`<dl>${row(q('方案','Plan'),D.PLAN_META[state.lang][plan].name,'data-order-plan')}${row(q('购买周期','Billing cycle'),annual?q('年付 · 一次支付全年费用','Annual · full year paid once'):q('月付','Monthly'),'data-order-billing')}${row(q('本次费用（人民币）','Price (CNY)'),money(o.amount),'data-order-amount')}${row(q('每月基础积分','Monthly base credits'),String(o.batch.base),'data-order-base')}${row(q('首个合资格月度批次','First eligible monthly batch'),launchEquation(),'data-order-batch')}${row(q('该批次最多生成（二选一）','Batch output (either type)'),q(`${est.images} 张图片 或 ${est.videoSeconds} 秒视频`,`${est.images} images OR ${est.videoSeconds} seconds of video`),'data-order-output')}</dl><p class="order-note" data-order-issuance>${annual?q('年费一次支付，积分按月发放。','The annual fee is paid once; credits are issued monthly. '):''}${issuanceNote()}</p><p class="order-note">${q('首发活动为上线起三个月；晚加入仅享剩余窗口内的合资格批次，不保证个人三个月赠分。','The activity runs for three months from launch. Joining later covers only eligible batches in the remaining window, not three personal bonus months.')}</p><p class="order-note">${expiryNote()}</p>`);
   }
-  function openBusiness(seatId) {
-    const mod=D.BUSINESS[state.lang].find(m=>m.seats.some(s=>s.id===seatId));
-    const seat=mod?.seats.find(s=>s.id===seatId);
-    if (!seat) return;
-    show(`${mod.title} · ${seat.name}`,`<p class="order-note">${q('按席配置，联系销售报价。当前为设计预览，未接入销售咨询，不会提交联系请求。','Per-seat configuration with a sales quote. This design preview is not connected to sales and does not submit a contact request.')}</p><dl>${row(q('方案','Plan'),mod.title)}${row(q('席位','Seat'),seat.name)}${row(q('积分','Credits'),q('共享积分池','Shared credit pool'))}</dl>`);
+  function openBusiness(contactId) {
+    // CN 3.2: Teams product CTAs (team / team-trial). Legacy seat ids still supported if present.
+    const raw = String(contactId || '');
+    const isTrial = raw.endsWith('-trial');
+    const modId = raw.replace(/-trial$/, '') || 'team';
+    const modules = D.BUSINESS[state.lang] || [];
+    let mod = modules.find(m => m.id === modId);
+    let seat = null;
+    if (!mod && Array.isArray(modules)) {
+      for (const m of modules) {
+        if (m.seats) seat = m.seats.find(s => s.id === raw);
+        if (seat) { mod = m; break; }
+      }
+    }
+    if (!mod) return;
+    const intent = isTrial
+      ? q('预约试用', 'Book a trial')
+      : (mod.cta || q('获取团队方案', 'Get a Teams plan'));
+    const seatRow = seat
+      ? row(q('席位','Seat'), seat.name)
+      : row(q('配置','Configuration'), q('席位分级可灵活配置','Flexible seat mix'));
+    show(`${mod.title} · ${intent}`,`<p class="order-note">${q('联系销售获取方案与合同价。当前为设计预览，未接入销售咨询，不会提交联系请求。','Contact sales for a plan and contract price. This design preview is not connected to sales and does not submit a contact request.')}</p><dl>${row(q('方案','Plan'),mod.title)}${seatRow}${row(q('积分','Credits'),q('共享积分池 · 不过期','Shared credit pool · never expire'))}${row(q('意向','Intent'),intent)}</dl>`);
   }
   function exportPayload() {
     return {version:'November launch Beta', demo:true, ...D.snapshotPricing(),
