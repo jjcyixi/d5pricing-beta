@@ -15,7 +15,7 @@ function listItems(items,editPrefix='') {
 }
 function launchEquation() {
   const b = D.monthlyBatch();
-  return `<span>${b.base} ${q('基础积分','base credits')}</span><span class="launch-plus"> + </span><span class="launch-gift">${b.bonus} <span data-edit-key="launch.giftLabel">${q('限时赠送','launch bonus')}</span></span><span class="launch-total"> = <strong>${b.total}</strong> ${q('积分','credits')}</span>`;
+  return `<span>${b.base} ${q('基础积分','base credits')}</span><span class="launch-plus"> + </span><span class="launch-gift">${b.bonus} <span data-edit-key="launch.giftLabel">${q('限时赠送','Limited-time bonus')}</span></span><span class="launch-total"> = <strong>${b.total}</strong> ${q('积分','credits')}</span>`;
 }
 function issuanceNote() {
   const b = D.monthlyBatch(true), after = D.monthlyBatch(false);
@@ -35,8 +35,8 @@ function capacityBlock(plan) {
   const images = Math.floor(credits / imagePer);
   const videoSeconds = Math.floor(credits / videoPerSec);
   const label = community
-    ? q('大约可生成', 'About')
-    : q('大约可生成', 'About');
+    ? q('大约可生成', 'Approx. output')
+    : q('大约可生成', 'Approx. output');
   const tip = q(
     '按最低价估算：图像 2 积分/张，视频（Seedance 2.0 Mini）12 积分/秒',
     'Lowest-rate estimate: images 2 credits each; video (Seedance 2.0 Mini) 12 credits/sec'
@@ -152,7 +152,7 @@ function renderPlans() {
     const scope = free ? q('Arco 体验 · Render 社区版','Arco exploration · Render Community') : pro ? q('D5 Render 专业版权益完整保留','Full D5 Render Pro benefits retained') : q('Arco · AI 创作','Arco · AI creation');
     const context=free?q('免费开始，探索你的第一个项目','Start free. Explore your first project.') : state.billing==='annual'?q('年费一次支付 · 积分按月发放','Annual payment · monthly credits'):q('按月购买 · 积分按月发放','Monthly payment · monthly credits');
     const batch=D.monthlyBatch(true), once=D.communityCredits(), days=D.communityDays();
-    const credit=free?`<div class="credit-kicker" data-edit-key="plan.community.creditKicker">${q('登录一次性领取','One-time on sign-in')}</div><div class="credit-amount"><strong data-demo-field="communityCredits" title="演示积分：框内直接修改">${once}</strong> ${q('积分','credits')}</div><p class="credit-basis" data-edit-key="plan.community.creditBasis">${q(`有效期 ${days} 天`,`Valid for ${days} days`)}</p>`:`<div class="credit-kicker" data-edit-key="plan.${id}.creditKicker">${q('每月基础积分','Monthly base credits')}</div><div class="credit-amount"><strong data-demo-field="monthlyCredits" title="演示积分：框内直接修改">${batch.base}</strong><span class="launch-gift" data-demo-field="launchBonus" title="演示赠送：框内直接修改"> + ${batch.bonus} <small data-edit-key="launch.giftLabel">${q('限时赠送','launch bonus')}</small></span></div><p class="credit-basis" data-edit-key="plan.${id}.creditBasis">${q(`共 ${batch.total} 积分`,`${batch.total} credits total`)}</p>`;
+    const credit=free?`<div class="credit-kicker" data-edit-key="plan.community.creditKicker">${q('登录一次性领取','One-time on sign-in')}</div><div class="credit-amount"><strong data-demo-field="communityCredits" title="演示积分：框内直接修改">${once}</strong> ${q('积分','credits')}</div><p class="credit-basis" data-edit-key="plan.community.creditBasis">${q(`有效期 ${days} 天`,`Valid for ${days} days`)}</p>`:`<div class="credit-kicker" data-edit-key="plan.${id}.creditKicker">${q('每月基础积分','Monthly base credits')}</div><div class="credit-amount"><strong data-demo-field="monthlyCredits" title="演示积分：框内直接修改">${batch.base}</strong><span class="launch-gift" data-demo-field="launchBonus" title="演示赠送：框内直接修改"> + ${batch.bonus} <small data-edit-key="launch.giftLabel">${q('限时赠送','Limited-time bonus')}</small></span></div><p class="credit-basis" data-edit-key="plan.${id}.creditBasis">${q(`共 ${batch.total} 积分`,`${batch.total} credits total`)}</p>`;
     const benefits = (() => {
       const html = benefitBlocks(id);
       const marker = `data-edit-key="plan.${id}.aiLabel"`;
@@ -177,17 +177,17 @@ function renderRules() {
   const el=$('#launch-rules-body');
   if(!el)return;
   const b=D.monthlyBatch(true), after=D.monthlyBatch(false);
-  el.innerHTML=`<div class="launch-band-head"><span class="launch-dot" aria-hidden="true"></span><strong data-edit-key="launch.title">${q('限时赠送 · 上线起三个月','Launch bonus · first three months')}</strong><span data-edit-key="launch.summary">${q(`${b.base} 基础积分 + ${b.bonus} 赠送积分`,`${b.base} base credits + ${b.bonus} bonus`)}</span><a href="#launch-details" data-edit-key="launch.view">${q('查看规则','View terms')} ↗</a></div><details id="launch-details"><summary data-edit-key="launch.detailsSummary">${q('活动与积分使用说明','Activity & credit terms')}</summary><p data-edit-key="launch.detailsBody">${q(`活动持续上线起三个月；基础版与专业版在窗口内获发的合资格月度批次均加赠 ${b.bonus} 积分。月付与年付规则相同，晚加入仅享剩余窗口内的合资格批次。窗口结束后，每月为 ${after.base} 基础积分。`,`The activity runs for three months from launch. Each eligible monthly batch issued to Basic or Pro within the window receives ${b.bonus} bonus credits. Monthly and annual plans follow the same rule; later joiners receive bonuses only for eligible batches remaining in the window. After the window, ${after.base} base credits are issued monthly.`)}</p><p data-edit-key="launch.expiry">${expiryNote()}</p><a class="text-link" href="topup.html" data-edit-key="launch.topupLink">${q('需要更多积分？查看充值规则 →','Need more credits? Top-up rules →')}</a></details>`;
+  el.innerHTML=`<div class="launch-band-head"><span class="launch-dot" aria-hidden="true"></span><strong data-edit-key="launch.title">${q('限时赠送 · 上线起三个月','Limited-time bonus · first three months')}</strong><span data-edit-key="launch.summary">${q(`${b.base} 基础积分 + ${b.bonus} 赠送积分`,`${b.base} base credits + ${b.bonus} bonus credits`)}</span><a href="#launch-details" data-edit-key="launch.view">${q('查看规则','View terms')} ↗</a></div><details id="launch-details"><summary data-edit-key="launch.detailsSummary">${q('活动与积分使用说明','Activity & credit terms')}</summary><p data-edit-key="launch.detailsBody">${q(`活动持续上线起三个月；基础版与专业版在窗口内获发的合资格月度批次均加赠 ${b.bonus} 积分。月付与年付规则相同，晚加入仅享剩余窗口内的合资格批次。窗口结束后，每月为 ${after.base} 基础积分。`,`The activity runs for three months from launch. Each eligible monthly batch issued to Basic or Pro within the window receives ${b.bonus} bonus credits. Monthly and annual plans follow the same rule; later joiners receive bonuses only for eligible batches remaining in the window. After the window, ${after.base} base credits are issued monthly.`)}</p><p data-edit-key="launch.expiry">${expiryNote()}</p><a class="text-link" href="topup.html" data-edit-key="launch.topupLink">${q('需要更多积分？查看充值规则 →','Need more credits? Top-up rules →')}</a></details>`;
 }
 function renderFaq() {
   const root = $('#faq-list');
   if (!root) return;
   const entries = [
-    [q('基础版和专业版有什么区别？','How do Basic and Pro differ?'),q('两者 AI 积分相同。基础版适合 Arco AI 创作；专业版另含完整 D5 渲染器专业版权益，Render 内增强与放大不消耗积分。完整差异可在上方对比表查看。','Both have the same AI allowance. Basic supports Arco AI creation; Pro adds full D5 Render Pro benefits, with no credit cost for enhance and upscale in Render. See the comparison above for all differences.')],
-    [q('年付如何发放积分？','How are credits issued with annual billing?'),q('年费一次支付，积分按月发放。首发赠送条件见上方「限时赠送」规则。','The annual fee is paid once; credits are issued monthly. See the launch bonus terms above for eligibility.')],
+    [q('基础版和专业版有什么区别？','How do Basic and Pro differ?'),q('两者 AI 积分相同。基础版适合 Arco AI 创作；专业版另含完整 D5 渲染器专业版权益，Render 内增强与放大不消耗积分。完整差异可在上方对比表查看。','Both have the same AI credits. Basic suits Arco AI creation; Pro adds full D5 Render Pro benefits, with no credit cost for enhance and upscale in Render. See the comparison above for all differences.')],
+    [q('年付如何发放积分？','How are credits issued with annual billing?'),q('年费一次支付，积分按月发放。首发赠送条件见上方「限时赠送」规则。','The annual fee is paid once; credits are issued monthly. See the Limited-time bonus terms above for eligibility.')],
     [q('图片与视频的产能可以同时获得吗？','Can I get both image and video estimates?'),q('不是。它们使用同一笔积分，分别是假设全部用于图片或全部用于视频的上限估算。图片按 2 积分/张，视频按 Seedance 2.0 Mini 12 积分/秒；实际消耗以模型、分辨率及设置为准。','No. The estimates use the same credit pool entirely for one output type: 2 credits/image or Seedance 2.0 Mini at 12 credits/sec. Actual cost depends on model, resolution and settings.')],
     [q('积分不够用，可以充值吗？','Can I top up if I need more credits?'),q('基础版与专业版在订期间可通过独立充值页补充积分，社区版不可充值。充值不改变版本功能。','Basic and Pro can add credits on the separate top-up page while subscribed. Community cannot top up. Top-ups do not change plan features.')],
-    [q('团队如何购买？','How do teams purchase?'),q('切换至「团队协作」查看团队版：席位分级可灵活配置，联系销售获取方案。本次发布加赠仅适用于个人版。','Switch to For teams to view Teams. Seat tiers are flexible — contact sales for a quote. This launch bonus applies only to personal plans.')]
+    [q('团队如何购买？','How do teams purchase?'),q('切换至「团队协作」查看团队版：席位分级可灵活配置，联系销售获取方案。本次发布加赠仅适用于个人版。','Switch to For teams to view the Teams plan: seat tiers are flexible — contact sales for a quote. This launch campaign bonus applies only to personal plans.')]
   ];
   root.innerHTML = entries.map(([question,answer],i)=>`<details><summary><span data-edit-key="faq.${i}.question">${question}</span><img src="assets/figma/caret-down-faq.svg" alt=""></summary><p data-edit-key="faq.${i}.answer">${answer}</p></details>`).join('');
 }

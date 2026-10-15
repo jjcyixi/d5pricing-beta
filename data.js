@@ -26,7 +26,7 @@
     en: {
       community: {name:'Community', desc:'Start free — explore AI design', info:'Free start · non-commercial; selected models & limited cloud', cta:'Start free'},
       basic: {name:'Basic', desc:'Explore ideas and design with AI', cta:'Subscribe Basic'},
-      pro: {name:'Pro', desc:'AI creation, plus full Pro rendering', cta:'Subscribe Pro'}
+      pro: {name:'Pro', desc:'Professional design and visualization workflows', cta:'Subscribe Pro'}
     }
   };
   const COMMUNITY = {
@@ -107,10 +107,10 @@
           'Dedicated enterprise support',
           '100 GB cloud storage',
           'Team admin console',
-          'Usage dashboard',
+          'Team analytics dashboard',
           'Shared credit pool · quota management',
-          'AI creation · all models · commercial use',
-          'Canvas sharing & member / digital asset management',
+          'AI creation and render outputs are commercial-use',
+          'Unlimited canvas sharing and participant seats',
         ],
         seatCompareLabel: 'Seat entitlements',
         seatCompare: {
@@ -128,10 +128,10 @@
           'Dedicated enterprise support',
           '100 GB cloud storage',
           'Team admin console',
-          'Usage dashboard',
+          'Team analytics dashboard',
           'Shared credit pool · quota management',
-          'AI creation · all models · commercial use',
-          'Canvas sharing & member / digital asset management',
+          'AI creation and render outputs are commercial-use',
+          'Unlimited canvas sharing and participant seats',
         ],
         termsLabel: 'Top-up & contract notes',
         termsBody: 'Credits never expire. Admins top up when short. Contract price confirmed by sales.',
@@ -146,9 +146,9 @@
       button: '立即申请',
     },
     en: {
-      title: 'D5 for Education',
-      subtitle: 'A special plan for enrolled university students — teaching and learning',
-      button: 'Apply',
+      title: 'D5 Student',
+      subtitle: 'A special benefits plan for enrolled university students — supporting teaching and learning',
+      button: 'Apply now',
     },
   };
 
@@ -203,7 +203,7 @@
       {id:'allowance', title:q('积分与创作','Credits & creation'), defaultOpen:true, rows:[
         [q('常规价格（人民币）','Regular price (CNY)'), '¥0', `¥${price('basic',billing)} / ${q(billing==='annual'?'年':'月',billing==='annual'?'yr':'mo')}`, `¥${price('pro',billing)} / ${q(billing==='annual'?'年':'月',billing==='annual'?'yr':'mo')}`],
         [q('基础积分','Base credits'),q(`一次性 ${once}`,`${once} once`),`${batch.base} ${each}`,`${batch.base} ${each}`],
-        [q('限时赠送','Launch bonus'), '—', q(`合资格月度批次 +${batch.bonus}`,`+${batch.bonus} per eligible monthly batch`),q(`合资格月度批次 +${batch.bonus}`,`+${batch.bonus} per eligible monthly batch`)],
+        [q('限时赠送','Limited-time bonus'), '—', q(`合资格月度批次 +${batch.bonus}`,`+${batch.bonus} per eligible monthly batch`),q(`合资格月度批次 +${batch.bonus}`,`+${batch.bonus} per eligible monthly batch`)],
         [q('首发合资格批次合计','Eligible launch batch total'), String(once), credits, credits],
         [q('同一积分池最多生成（二选一）','Same pool: up to either output'),q(`${onceEst.images} 张图片 或 ${onceEst.videoSeconds} 秒视频`,`${onceEst.images} images OR ${onceEst.videoSeconds} seconds of video`),q(`${paidEst.images} 张图片 或 ${paidEst.videoSeconds} 秒视频`,`${paidEst.images} images OR ${paidEst.videoSeconds} seconds of video`),q(`${paidEst.images} 张图片 或 ${paidEst.videoSeconds} 秒视频`,`${paidEst.images} images OR ${paidEst.videoSeconds} seconds of video`)],
         [q('活动窗口结束后','After the launch window'),q('一次性权益不变','One-time allowance unchanged'),q(`每月 ${after.base} 基础积分`,`${after.base} base credits / month`),q(`每月 ${after.base} 基础积分`,`${after.base} base credits / month`)]
@@ -212,7 +212,7 @@
         [q('模型','Models'),q('部分开放','Selected'),q('全部开放','All'),q('全部开放','All')],
         [q('同时运行 AI 任务','Concurrent AI tasks'),'2',String(t.concurrency),String(t.concurrency)],
         [q('图片 · 视频最高规格','Image · video limits'),'1K · 480P',`${t.imageRes.basic} · ${t.videoRes.basic}`,`${t.imageRes.pro} · ${t.videoRes.pro}`],
-        [q('商用','Commercial use'),q('不可商用','Non-commercial'),q('AI 生成内容可商用','AI output'),q('全部成果可商用','All deliverables')],
+        [q('商用','Commercial use'),q('不可商用','Non-commercial'),q('AI 生成内容可商用','Commercial-use AI output'),q('全部成果可商用','All deliverables commercial-use')],
         [q('Arco 增强与放大','Arco enhance & upscale'),q('消耗积分','Uses credits'),q('消耗积分','Uses credits'),q('消耗积分','Uses credits')],
         [q('Render 增强与放大','Render enhance & upscale'),q('不支持','Unavailable'),q('不支持','Unavailable'),q('不消耗积分','No credit consumption')]
       ]},
