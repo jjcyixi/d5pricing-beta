@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#000000">
+  <meta name="d5-cloud-api" content="">
+  <meta name="description" content="D5 首发方案：基础版与专业版每月 1000 基础积分，首发合资格批次加赠 500。">
+  <title>D5 · 首发方案 Beta</title>
+  <link rel="icon" href="assets/d5-logo.png">
+  <link rel="stylesheet" href="styles.css?v=202611-beta-1">
+  <link rel="stylesheet" href="beta.css?v=202611-beta-gork-1">
+  <link rel="stylesheet" href="editor.css?v=202611-beta-gork-cloud-1">
+</head>
+<body data-page="pricing">
+  <a class="skip-link" href="#main" data-zh="跳至主要内容" data-en="Skip to content">跳至主要内容</a>
+  <header class="global-nav">
+    <a class="brand" href="#pricing" aria-label="D5"><img src="assets/brand.webp" alt=""><span>D5</span></a>
+    <nav class="section-nav" aria-label="Page sections">
+      <a href="#pricing" data-zh="方案" data-en="Plans">方案</a>
+      <a href="#comparison" class="personal-only" data-zh="权益对比" data-en="Compare">权益对比</a>
+
+      <a href="#faq">FAQ</a>
+    </nav>
+    <fieldset class="language-switch" aria-label="Language">
+      <button type="button" data-lang="zh" aria-pressed="true">中文</button><button type="button" data-lang="en" aria-pressed="false">EN</button>
+    </fieldset>
+  </header>
+  <main id="main">
+    <section class="hero container" data-module="hero">
+      <span class="beta-marker" data-zh="Beta · 首发版预览" data-en="Beta · Launch preview">Beta · 首发版预览</span>
+      <h1 data-edit-key="hero.title" data-zh="选择你心仪的方案" data-en="Choose the plan that suits you">选择你心仪的方案</h1>
+      <p class="hero-subtitle" data-edit-key="hero.subtitle" data-zh="从创意探索，到专业表达。" data-en="From creative exploration to professional expression."></p>
+    </section>
+    <section class="pricing container" id="pricing" aria-label="Plans">
+      <div class="pricing-toolbar">
+        <div class="segmented audience-switch" role="group" aria-label="选择用户类别">
+          <button type="button" data-audience="personal" aria-pressed="true" data-zh="个人创作" data-en="For creators">个人创作</button>
+          <button type="button" data-audience="team" aria-pressed="false" data-zh="团队协作" data-en="For teams">团队协作</button>
+        </div>
+        <div class="billing personal-only">
+          <span data-zh="按月" data-en="Monthly">按月</span>
+          <button type="button" class="toggle" data-billing-toggle aria-pressed="false" aria-label="切换按年购买"><span></span></button>
+          <div class="billing-annual"><span data-zh="按年" data-en="Yearly">按年</span><b data-zh="常规年付价" data-en="Regular annual rate">常规年付价</b></div>
+        </div>
+      </div>
+      <aside class="launch-band personal-only" id="launch-rules" aria-label="Launch bonus" data-module="launchBand"><div id="launch-rules-body"></div></aside>
+      <div class="plan-grid" id="plan-grid"></div>
+      <div class="education personal-only" data-module="education"><div class="education-inner">
+        <strong data-education="title">D5学生版</strong>
+        <span data-education="subtitle">专为高校在校生推出的特别权益方案，助力教与学</span>
+        <a href="https://www.d5render.cn/edu/" data-education="button">立即申请</a>
+      </div></div>
+    </section>
+    <section class="section container personal-only" id="comparison" data-module="comparison" aria-labelledby="comparison-title">
+      <div class="section-head"><h2 id="comparison-title" data-edit-key="comparison.title" data-zh="完整功能对比" data-en="Compare all features">完整功能对比</h2><p data-edit-key="comparison.subtitle" data-zh="从 AI 创作到专业渲染，找到适合你的工作流" data-en="From AI creation to professional rendering, find your workflow"></p></div>
+      <p class="compare-hint" data-zh="左右滑动，查看完整对比 →" data-en="Swipe to compare all features →"></p>
+      <div class="compare-scroll" tabindex="0" role="region" aria-labelledby="comparison-title"><div id="compare"></div></div>
+      <p class="comparison-note" data-zh="以上产出均按同一笔积分全部用于图片或视频估算，不可叠加。年付也按月度批次展示；具体消耗及输出规格随模型与设置变化。" data-en="Output estimates use the same pool entirely for images or video and cannot be added together. Annual billing also shows monthly-batch output. Costs and output limits vary by model and settings."></p>
+    </section>
+    <section class="faq" id="faq" data-module="faq" aria-labelledby="faq-title"><div class="container faq-inner"><div class="faq-title"><h2 id="faq-title" data-edit-key="faq.title">FAQ</h2></div><div class="faq-list" id="faq-list"></div></div></section>
+  </main>
+  <footer class="beta-footer" data-module="footer"><a class="brand" href="#pricing"><span>D5</span></a><span data-edit-key="footer.tagline" data-zh="让创作走得更远" data-en="Take your creativity further"></span><div class="footer-links"><a href="topup.html" data-zh="积分充值" data-en="Credit top-ups"></a><button type="button" data-export data-zh="导出方案数据" data-en="Export plan data"></button></div></footer>
+  <dialog id="order-preview" aria-labelledby="preview-title" aria-describedby="preview-demo"><div id="preview-content"></div></dialog>
+  <div class="sr-only" id="announcer" role="status" aria-live="polite"></div>
+  <script src="data.js?v=202611-beta-gork-1"></script>
+  <script src="i18n-sync.js?v=202611-beta-1"></script>
+  <script src="business.js?v=202611-beta-gork-1"></script>
+  <script src="app.js?v=202611-beta-gork-1"></script>
+  <script src="flows.js?v=202611-beta-gork-1"></script>
+  <script src="editor.js?v=202611-beta-gork-cloud-1"></script>
+  <script src="cloud-sync.js?v=202611-beta-gork-cloud-1"></script>
+</body>
+</html>

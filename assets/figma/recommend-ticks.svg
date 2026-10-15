@@ -1,0 +1,7 @@
+<svg preserveAspectRatio="none" overflow="visible" style="display: block;" width="296" height="8" viewBox="0 0 296 8" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="ticks">
+<path id="Marker" d="M0 1C0 0.447715 0.447715 0 1 0C1.55228 0 2 0.447715 2 1V7C2 7.55228 1.55228 8 1 8C0.447715 8 0 7.55228 0 7V1Z" fill="white" fill-opacity="0.4"/>
+<path id="Marker_2" d="M147 1C147 0.447715 147.448 0 148 0C148.552 0 149 0.447715 149 1V7C149 7.55228 148.552 8 148 8C147.448 8 147 7.55228 147 7V1Z" fill="white" fill-opacity="0.4"/>
+<path id="Marker_3" d="M294 1C294 0.447715 294.448 0 295 0C295.552 0 296 0.447715 296 1V7C296 7.55228 295.552 8 295 8C294.448 8 294 7.55228 294 7V1Z" fill="white" fill-opacity="0.4"/>
+</g>
+</svg>

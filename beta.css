@@ -1,0 +1,230 @@
+/* November launch additions to the original V4 visual system. */
+:root { --text:#fff; }
+:focus-visible { outline:2px solid #c9acff; outline-offset:4px; }
+.skip-link { position:fixed; top:-100px; left:12px; z-index:200; padding:12px; background:#fff; color:#000; }
+.skip-link:focus { top:12px; }
+.global-nav { gap:16px; padding-inline:max(24px,calc((100vw - 1320px)/2)); }
+.section-nav { display:flex; justify-content:center; gap:28px; color:var(--text-60); font-size:13px; }
+.section-nav a:hover { color:#fff; }
+.hero { padding-top:72px; gap:20px; }
+.hero h1 { font-size:clamp(32px,4.4vw,60px); letter-spacing:-.035em; }
+.beta-marker { display:inline-flex; align-self:center; font-size:11px; font-weight:500; letter-spacing:.04em; line-height:18px; padding:4px 10px; color:#bbb5cd; border:1px solid rgba(180,160,220,.22); border-radius:20px; }
+.billing b { background:rgba(148,89,255,.15); color:#c9acff; }
+.pricing-toolbar { padding-bottom:28px; }
+.plan-card:not(.seat-card) .plan-zone-a { flex:1; gap:14px; }
+.plan-card:not(.seat-card) { gap:22px; }
+.plan-card:not(.seat-card) .plan-position { min-height:48px; }
+.plan-card:not(.seat-card) .plan-price { margin-top:6px; }
+.plan-card:not(.seat-card) .price-value { font-size:42px; letter-spacing:-.03em; }
+.price-context { min-height:38px; color:var(--text-60); font-size:12px; line-height:19px; }
+.pro .price-context { color:#c9d3ff; }
+.launch-credit { padding:14px 16px; border:1px solid rgba(148,89,255,.25); border-radius:12px; background:linear-gradient(130deg,rgba(148,89,255,.10),transparent); }
+.launch-label { color:var(--text-60); font-size:11px; line-height:18px; margin-bottom:8px; }
+.launch-equation { font-size:13px; line-height:23px; }
+.launch-gift { color:#c9acff; }
+.launch-total { display:block; margin-top:3px; color:var(--text-80); }
+.launch-total strong { font-size:27px; line-height:34px; font-weight:600; color:#fff; }
+.issuance-note { color:var(--text-60); font-size:11px; line-height:18px; }
+.community-credit { padding:16px; min-height:110px; border:1px solid var(--border-10); border-radius:12px; color:var(--text-80); }
+.community-credit strong { font-size:22px; line-height:30px; font-weight:500; }
+.community-credit p { font-size:12px; margin-top:8px; color:var(--text-60); }
+.pool-note { font-size:11px; line-height:18px; color:var(--text-60); }
+.batch-footnote { max-width:900px; margin:20px auto 12px; text-align:center; font-size:12px; line-height:20px; color:var(--text-60); }
+.education { margin-top:8px; margin-bottom:40px; }
+.education-inner { flex-wrap:wrap; }
+.education span { white-space:normal; }
+.section { padding-bottom:72px; }
+.section-head p { font-size:14px; font-weight:400; line-height:22px; }
+.comparison-note { margin-top:20px; font-size:12px; line-height:20px; color:var(--text-60); max-width:900px; }
+.rule-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); border:1px solid var(--border-10); border-radius:16px; }
+.rule-item { padding:28px; }
+.rule-item+.rule-item { border-left:1px solid var(--border-10); }
+.rule-item h3 { margin-bottom:12px; font-size:16px; font-weight:500; }
+.rule-item p { color:var(--text-60); font-size:13px; line-height:23px; }
+.text-link { display:inline-block; margin-top:22px; color:#c9acff; font-size:13px; }
+.benefit-terms a { color:#c9acff; text-decoration:underline; text-underline-offset:3px; }
+.beta-footer { display:flex; align-items:center; gap:24px; padding:48px max(24px,calc((100vw - 1320px)/2)); color:var(--text-60); background:#161619; font-size:12px; }
+.footer-links { margin-left:auto; display:flex; gap:24px; }
+#order-preview { color:#fff; font:inherit; width:min(600px,calc(100% - 32px)); max-height:calc(100dvh - 40px); padding:28px; border:1px solid rgba(180,160,220,.3); border-radius:20px; background:#141216; overflow:auto; overscroll-behavior:contain; }
+#order-preview::backdrop { background:rgba(0,0,0,.76); backdrop-filter:blur(6px); }
+body:has(dialog[open]) { overflow:hidden; }
+.preview-top { display:flex; align-items:center; justify-content:space-between; margin-bottom:22px; }
+.close-preview { width:40px; height:40px; font-size:26px; border-radius:50%; background:rgba(255,255,255,.05); }
+#preview-title { font-size:26px; line-height:36px; font-weight:600; }
+.preview-demo { color:#c9acff; font-size:12px; line-height:20px; margin-top:10px; }
+#order-preview dl { margin:20px 0; }
+.order-row { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1.4fr); gap:18px; padding:14px 0; border-bottom:1px solid var(--border-10); font-size:13px; line-height:22px; }
+.order-row dt { color:var(--text-60); }
+.order-row dd { margin:0; text-align:right; overflow-wrap:anywhere; }
+[data-order-amount] { font-size:25px; line-height:32px; font-weight:600; }
+.order-note { font-size:12px; line-height:21px; color:var(--text-60); margin:12px 0; }
+.preview-done { width:100%; min-height:46px; padding:12px; margin-top:20px; background:var(--ai); border-radius:30px; font-weight:500; }
+.topup-main { width:min(900px,calc(100% - 32px)); margin:64px auto 96px; }
+.topup-main h1 { font-size:40px; line-height:1.25; margin:24px 0 18px; }
+.topup-main>.lead { font-size:16px; color:var(--text-60); margin-bottom:32px; }
+.topup-box { padding:28px; border:1px solid var(--border-10); border-radius:16px; margin-top:24px; }
+.topup-box h2 { font-size:20px; margin-bottom:18px; }
+.topup-status { margin-top:20px; padding:20px; border:1px solid rgba(148,89,255,.3); border-radius:12px; background:rgba(148,89,255,.07); }
+.topup-status h3 { margin-bottom:10px; }
+.topup-status p { color:var(--text-60); line-height:24px; }
+.topup-selector { display:flex; gap:10px; flex-wrap:wrap; }
+.topup-selector button { border:1px solid var(--border-10); padding:10px 18px; border-radius:24px; }
+.topup-selector button[aria-pressed="true"] { background:rgba(148,89,255,.25); border-color:#9459ff; }
+@media (max-width:900px) {
+  .global-nav { flex-wrap:wrap; height:auto; min-height:64px; padding-block:12px; gap:10px; }
+  .section-nav { order:3; width:100%; justify-content:space-around; gap:10px; font-size:12px; padding-top:6px; }
+  .global-nav>.language-switch { margin-left:auto; }
+  .hero { padding-top:48px; }
+  .plan-card:not(.seat-card) .plan-position { min-height:0; }
+  .rule-grid { grid-template-columns:1fr; }
+  .rule-item+.rule-item { border-left:0; border-top:1px solid var(--border-10); }
+  .education { margin-bottom:16px; }
+}
+@media (max-width:640px) {
+  html { scroll-padding-top:112px; }
+  .billing { justify-content:center; font-size:13px; gap:12px; }
+  .segmented { justify-content:center; }
+  .segmented button { flex:1; }
+  .hero h1 { font-size:32px; }
+  .plan-card:not(.seat-card) .price-value { font-size:38px; }
+  .beta-footer { flex-wrap:wrap; gap:16px; padding:32px 24px; }
+  .footer-links { width:100%; margin-left:0; }
+  #order-preview { padding:20px; }
+  .order-row { grid-template-columns:minmax(0,1fr) minmax(0,1.45fr); gap:12px; }
+  .topup-main h1 { font-size:32px; }
+  .topup-box { padding:20px; }
+}
+
+/* Beta 2: one editorial rhythm, aligned decision cards. */
+body[data-page="pricing"] { --content-width:min(1200px,calc(100% - 48px)); background:#080809; }
+body[data-page="pricing"] .global-nav { background:rgba(8,8,9,.94); border-bottom:1px solid var(--border-6); }
+body[data-page="pricing"] .hero { padding:56px 0 30px; gap:14px; }
+body[data-page="pricing"] .hero h1 { font-size:clamp(30px,3.4vw,44px); font-weight:550; line-height:1.2; letter-spacing:-.035em; }
+body[data-page="pricing"] .hero .hero-subtitle { font-size:15px; font-weight:400; color:var(--text-60); line-height:24px; }
+body[data-page="pricing"] .beta-marker { border:0; padding:0; color:#97919f; font-size:11px; }
+body[data-page="pricing"] .pricing-toolbar { padding:8px 0 24px; }
+body[data-page="pricing"] .segmented { height:40px; border-width:1px; }
+body[data-page="pricing"] .billing { font-size:13px; font-weight:400; gap:12px; }
+body[data-page="pricing"] .billing b { font-size:10px; padding:3px 7px; }
+.launch-band { margin:0 0 24px; padding:14px 20px; border:1px solid rgba(170,135,226,.22); background:rgba(139,92,246,.045); border-radius:12px; color:var(--text-80); font-size:12px; line-height:20px; }
+.launch-band-head { display:flex; align-items:center; flex-wrap:wrap; gap:8px 14px; }
+.launch-dot { height:6px; width:6px; border-radius:50%; background:#b392f5; }
+.launch-band-head strong { color:#d4c0f9; font-weight:500; font-size:13px; }
+.launch-band-head>a { margin-left:auto; color:#bca0e4; font-size:12px; }
+.launch-band details { margin:0; }
+.launch-band summary { font-size:11px; margin-top:8px; color:#aaa2b4; cursor:pointer; }
+.launch-band details:not([open]) summary { display:none; }
+.launch-band p { margin-top:12px; max-width:960px; color:#b2aab9; font-size:12px; line-height:21px; }
+.launch-band .text-link { margin-top:12px; }
+body[data-page="pricing"] .plan-grid:not(.is-team) { gap:20px; align-items:stretch; }
+body[data-page="pricing"] .plan-card:not(.seat-card) { padding:26px; gap:20px; background:#101012; border:1px solid #2b2a2e; border-radius:16px; min-width:0; box-shadow:none; }
+body[data-page="pricing"] .plan-card.pro { border-color:rgba(170,135,226,.6); background:linear-gradient(180deg,rgba(144,105,210,.085),transparent 320px),#101012; }
+body[data-page="pricing"] .plan-card:not(.seat-card) .plan-zone-a { display:flex; flex-direction:column; flex:0 0 auto; gap:0; min-height:225px; }
+body[data-page="pricing"] .plan-title { display:flex; flex-direction:column; gap:10px; }
+body[data-page="pricing"] .plan-name h2 { font-size:25px; line-height:34px; font-weight:500; letter-spacing:-.025em; }
+body[data-page="pricing"] .plan-card:not(.seat-card) .plan-position { min-height:44px; line-height:22px; color:#a9a5ae; font-size:13px; }
+body[data-page="pricing"] .product-scope { min-height:24px; font-size:11px; line-height:20px; margin-top:8px; color:#a9a5ae; }
+body[data-page="pricing"] .pro-anchor { color:#d1bcf0; font-weight:500; }
+body[data-page="pricing"] .plan-card:not(.seat-card) .plan-price { display:flex; align-items:baseline; gap:7px; height:64px; margin-top:17px; }
+body[data-page="pricing"] .plan-card:not(.seat-card) .price-value { font-size:44px; font-weight:500; line-height:56px; }
+body[data-page="pricing"] .price-period { font-size:12px; line-height:20px; color:#99949f; }
+body[data-page="pricing"] .price-context { min-height:20px; font-size:11px; line-height:20px; margin-top:0; color:#99949f; }
+body[data-page="pricing"] .plan-button { height:44px; min-height:44px; font-size:13px; font-weight:500; border-radius:8px; margin:0; background:#27262c; border:1px solid rgba(255,255,255,.1); color:#fff; }
+body[data-page="pricing"] .basic .plan-button { background:#efedf3; color:#18151d; border-color:#efedf3; }
+body[data-page="pricing"] .pro .plan-button { background:#9e70e7; border-color:#9e70e7; color:#fff; }
+body[data-page="pricing"] .plan-button:hover { filter:brightness(1.13); }
+body[data-page="pricing"] .benefit-stack { gap:20px; }
+body[data-page="pricing"] .benefit-ai { padding:18px 16px; background:#18151d; border:1px solid rgba(158,112,231,.15); border-radius:10px; min-width:0; }
+body[data-page="pricing"] .benefit-label { color:#bfa4e7; font-size:11px; font-weight:500; letter-spacing:.02em; margin-bottom:0; }
+.card-credit { margin-top:14px; }
+.credit-kicker { color:#b8afc1; font-size:11px; line-height:18px; }
+.credit-amount { display:flex; flex-wrap:wrap; align-items:baseline; gap:6px; margin:5px 0 2px; font-size:12px; line-height:28px; }
+.credit-amount>strong { font-size:28px; line-height:34px; color:#fff; font-weight:500; letter-spacing:-.02em; }
+.credit-amount .launch-gift { font-size:17px; font-weight:500; }
+.credit-amount small { font-size:10px; font-weight:400; }
+.credit-basis { color:#9e93ab; font-size:11px; line-height:19px; }
+body[data-page="pricing"] .capacity-zone { margin-top:16px; padding:14px 0 0; border:0; border-top:1px solid rgba(255,255,255,.08); border-radius:0; background:none; }
+body[data-page="pricing"] .capacity-label { font-size:10px; color:#a69bb2; line-height:18px; }
+body[data-page="pricing"] .generation-output { display:inline; font-size:12px; line-height:25px; }
+body[data-page="pricing"] .generation-output b { font-size:18px; font-weight:500; line-height:28px; color:#e1d8ee; }
+body[data-page="pricing"] .generation-or { margin-left:6px; color:#958a9f; font-size:11px; }
+body[data-page="pricing"] .pool-note { font-size:10px; line-height:17px; margin-top:3px; }
+body[data-page="pricing"] .generation-assumptions { font-size:10px; margin-top:6px; }
+body[data-page="pricing"] .generation-assumptions summary { color:#a299ae; }
+body[data-page="pricing"] .plan-list { gap:10px; margin-top:16px; }
+body[data-page="pricing"] .plan-list li { font-size:12px; line-height:21px; color:#c2bdc8; gap:8px; }
+body[data-page="pricing"] .plan-list b { font-weight:500; color:#e7e3ec; }
+body[data-page="pricing"] .plan-list .check { width:13px; height:13px; opacity:.7; margin-top:4px; }
+body[data-page="pricing"] .benefit-divider { display:none; }
+body[data-page="pricing"] .benefit-workflow { padding:0; }
+body[data-page="pricing"] .benefit-workflow .benefit-label { color:#aaa3b3; }
+body[data-page="pricing"] .feature-inheritance { font-size:11px; margin-top:9px; color:#a99fb7; }
+body[data-page="pricing"] .feature-storage { font-size:11px; line-height:20px; margin-top:12px; color:#a69ab6; }
+body[data-page="pricing"] .benefit-terms { margin-top:auto; border-top:1px solid var(--border-6); padding-top:14px; font-size:11px; color:#9a92a3; }
+body[data-page="pricing"] .education { margin:24px 0 0; padding:0; }
+body[data-page="pricing"] .education-inner { display:flex; width:100%; min-height:76px; padding:20px 26px; border:1px solid var(--border-10); border-radius:12px; background:#101012; gap:12px 20px; }
+body[data-page="pricing"] .education strong { font-size:15px; line-height:22px; }
+body[data-page="pricing"] .education span { font-size:12px; line-height:20px; color:#99939f; }
+body[data-page="pricing"] .education a { margin-left:auto; padding:7px 15px; border:1px solid #3a3541; border-radius:6px; font-size:12px; color:#ddd4e9; white-space:nowrap; }
+body[data-page="pricing"] .section { padding-top:64px; padding-bottom:0; }
+body[data-page="pricing"] .section-head { margin-bottom:28px; }
+body[data-page="pricing"] .section-head h2 { font-size:28px; line-height:38px; font-weight:500; letter-spacing:-.02em; }
+body[data-page="pricing"] .section-head p { font-size:13px; margin-top:10px; color:#99919f; }
+.compare-hint { display:none; }
+body[data-page="pricing"] .compare-table { font-size:12px; }
+body[data-page="pricing"] .compare-table thead th { background:#121114; }
+body[data-page="pricing"] .compare-table th.lead { position:sticky; left:0; background:#0d0c0f; z-index:2; }
+body[data-page="pricing"] .compare-table thead th.lead { z-index:3; }
+body[data-page="pricing"] .comparison-note { font-size:11px; color:#918899; }
+body[data-page="pricing"] .faq { margin-top:64px; background:#0d0c0f; padding:56px 0; }
+body[data-page="pricing"] .faq h2 { font-size:28px; font-weight:500; }
+body[data-page="pricing"] .faq-list summary { font-size:14px; }
+body[data-page="pricing"] .beta-footer { padding-block:32px 84px; background:#080809; border-top:1px solid var(--border-6); }
+@media (min-width:901px) {
+ body[data-page="pricing"] .benefit-ai { min-height:405px; }
+}
+@media (max-width:900px) {
+ body[data-page="pricing"] .plan-grid:not(.is-team) { grid-template-columns:1fr; max-width:560px; margin:auto; gap:16px; }
+ body[data-page="pricing"] .plan-card:not(.seat-card) .plan-zone-a { min-height:0; }
+ body[data-page="pricing"] .education-inner { align-items:center; }
+ .compare-hint { display:block; color:#a494b6; font-size:11px; margin-bottom:12px; }
+ body[data-page="pricing"] .compare-scroll { overflow-x:auto; -webkit-overflow-scrolling:touch; }
+ body[data-page="pricing"] .compare-table { min-width:760px; }
+ body[data-page="pricing"] .global-nav { flex-wrap:nowrap; height:64px; padding-block:0; }
+ body[data-page="pricing"] .section-nav { width:auto; order:0; }
+ body[data-page="pricing"] .section-nav a:not(:first-child) { display:none; }
+}
+@media (max-width:640px) {
+ body[data-page="pricing"] { --content-width:calc(100% - 32px); }
+ body[data-page="pricing"] .hero { padding:36px 0 24px; }
+ body[data-page="pricing"] .hero h1 { font-size:30px; }
+ body[data-page="pricing"] .hero .hero-subtitle { font-size:13px; }
+ body[data-page="pricing"] .pricing-toolbar { flex-direction:column; gap:18px; padding:0 0 20px; }
+ body[data-page="pricing"] .audience-switch { width:100%; }
+ body[data-page="pricing"] .plan-card:not(.seat-card) { padding:24px; }
+ body[data-page="pricing"] .plan-card:not(.seat-card) .plan-position { min-height:0; }
+ body[data-page="pricing"] .plan-card:not(.seat-card) .plan-price { margin-top:12px; }
+ .launch-band { padding:14px 16px; }
+ .launch-band-head { gap:5px 10px; }
+ .launch-band-head>span:not(.launch-dot) { order:3; flex-basis:100%; font-size:11px; }
+ .credit-amount { flex-wrap:wrap; }
+ body[data-page="pricing"] .education-inner { padding:20px; display:grid; grid-template-columns:1fr auto; }
+ body[data-page="pricing"] .education span { grid-column:1/-1; grid-row:2; }
+ body[data-page="pricing"] .education a { grid-column:2; grid-row:1; }
+ body[data-page="pricing"] .section { padding-top:48px; }
+ body[data-page="pricing"] .section-head h2 { font-size:24px; }
+ body[data-page="pricing"] .faq { margin-top:48px; padding:40px 0; }
+ body[data-page="pricing"] .beta-footer { padding-bottom:120px; }
+}
+
+body[data-page="pricing"] .hero { padding-top:38px; padding-bottom:24px; }
+body[data-page="pricing"] .hero h1 { font-size:clamp(30px,3vw,40px); }
+body[data-page="pricing"] .plan-card:not(.seat-card) .plan-zone-a { min-height:200px; }
+body[data-page="pricing"] .benefit-ai { gap:0; min-height:0; outline:0; }
+body[data-page="pricing"] .benefit-stack .plan-list li { padding:0; }
+body[data-page="pricing"] .capacity-zone { display:block; }
+body[data-page="pricing"] .generation-output { white-space:nowrap; }
+body[data-page="pricing"] .capacity-label { margin-bottom:5px; }
+body[data-page="pricing"] .feature-upgrade { background:none; border:0; }
+body[data-page="pricing"] .feature-upgrade [data-features-list] li:first-child { font-size:12px; }
+@media(max-width:900px) { body[data-page="pricing"] .plan-card:not(.seat-card) .plan-zone-a { min-height:0; } }

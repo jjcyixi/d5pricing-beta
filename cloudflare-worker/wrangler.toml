@@ -1,0 +1,20 @@
+# D5 Beta pricing share — Cloudflare Worker + per-project Durable Object
+# Deploy: see README-CLOUD.md
+# KV is NOT the source of truth (removed). Persistence = Durable Object storage.
+
+name = "d5-pricing-beta-share"
+main = "src/worker.js"
+compatibility_date = "2024-11-01"
+
+# Comma-separated Origins for CORS (scheme+host+port only — no path).
+# GitHub Pages Origin is https://jjcyixi.github.io (path /d5pricing-beta/ is NOT part of Origin).
+[vars]
+ALLOWED_ORIGINS = "https://jjcyixi.github.io,http://127.0.0.1:8768,http://localhost:8768,http://127.0.0.1:8770,http://localhost:8770,http://127.0.0.1:8080,http://localhost:8080"
+
+[[durable_objects.bindings]]
+name = "PROJECT"
+class_name = "ProjectDO"
+
+[[migrations]]
+tag = "v1"
+new_classes = ["ProjectDO"]
