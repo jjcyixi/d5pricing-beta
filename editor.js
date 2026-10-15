@@ -426,6 +426,16 @@
           else if (p === 'paddingTop') e.style.paddingTop = val + 'px';
           else e.style[p] = val;
         }
+        // Collapse emptied hand-edits so deleted copy does not leave blank rows
+        const blank = !(e.textContent || '').trim();
+        const li = e.closest('li');
+        if (li && e.matches('span, [data-edit-key], [data-edit-auto]')) {
+          li.hidden = blank;
+          li.style.display = blank ? 'none' : '';
+        } else if (e.matches('.pool-note, .pro-retained, .feature-inheritance, .feature-storage, p.credit-basis')) {
+          e.hidden = blank;
+          e.style.display = blank ? 'none' : '';
+        }
       });
     } finally {
       applyingDom = false;
