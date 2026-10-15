@@ -46,8 +46,10 @@ function capacityBlock(plan) {
       <span class="capacity-label" data-edit-key="plan.${plan}.capacityLabel">${label}</span>
       <button type="button" class="estimate-tip" aria-label="${q('估算说明','Estimate details')}" data-tip="${tip.replace(/"/g, '&quot;')}">?</button>
     </div>
-    <div class="generation-output" data-edit-key="plan.${plan}.capacityImages"><b data-image-count>${images.toLocaleString('en-US')}</b> ${q('张图片','images')}</div>
-    <div class="generation-output" data-edit-key="plan.${plan}.capacityVideo"><span class="generation-or" data-edit-key="plan.${plan}.capacityOr">${q('或','or')}</span> <b data-video-seconds>${videoSeconds.toLocaleString('en-US')}</b> ${q('秒视频','seconds of video')}</div>
+    <div class="generation-output-row">
+      <div class="generation-output" data-edit-key="plan.${plan}.capacityImages"><b data-image-count>${images.toLocaleString('en-US')}</b> ${q('张图片','images')}</div>
+      <div class="generation-output" data-edit-key="plan.${plan}.capacityVideo"><span class="generation-or" data-edit-key="plan.${plan}.capacityOr">${q('或','or')}</span> <b data-video-seconds>${videoSeconds.toLocaleString('en-US')}</b> ${q('秒视频','seconds of video')}</div>
+    </div>
     <p class="pool-note" data-edit-key="plan.${plan}.capacityPoolNote">${q('同一积分池，二选一','Same credit pool · either')}</p>
   </div>`;
 }

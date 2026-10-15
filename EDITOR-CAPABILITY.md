@@ -31,16 +31,18 @@
 
 页面上带黄虚线的 `[data-demo-field]` 节点点击会打开同一面板，避免 contenteditable 改出假价。
 
-## 云端分享（Cloudflare Worker + KV）
+## 云端分享（Cloudflare Worker + 每项目 Durable Object）
 
 | 能力 | 位置 |
 |---|---|
-| 创建私有项目 + 编辑/只读双链接 | `cloud-sync.js`「云端分享」；`POST /api/projects` |
+| 创建私有项目 + 编辑/只读双链接 | `cloud-sync.js`「云端分享」；`POST /api/projects` → ProjectDO |
 | 保存到云端 / 拉取最新 | 同面板；`PUT` / `GET`；本地 `localStorage` 仍作缓存 |
-| 版本冲突 409 | 提示拉取或「强制覆盖」（需确认）；后存不静默覆盖 |
+| 版本冲突 409（强一致） | DO 内串行 check+write；同 version 并发仅一成；UI 提示拉取或「强制覆盖」 |
+| 分享链接保留 Pages 子路径 | `pageShareBase()` 用当前页 URL；例 `…/d5pricing-beta/?project=…` |
+| CORS Origin | `https://jjcyixi.github.io`（**不含** `/d5pricing-beta` 路径） |
 | 配置 API | `window.D5_CLOUD_API` / `<meta name="d5-cloud-api">` / `localStorage d5-cloud-api-base` |
-| Worker | `cloudflare-worker/`（见 `README-CLOUD.md`） |
-| 离线 HTML | `buildHtml` **不**写入 edit/view token；导出后云端会话不跟文件走 |
-| 公开列表 | **无** — 仅持链接者可访问 |
+| Worker | `cloudflare-worker/`（DO binding `PROJECT`；**无 KV 权威存储**） |
+| 离线 HTML | `buildHtml` **不**写入 edit/view token |
+| 公开列表 | **无** |
 
-**尚无公网 Worker URL**：需 `wrangler login` + `deploy` 后把地址配进前端。未配置时 UI 明示「仅本地」，编辑器不崩溃。
+**尚无公网 Worker URL / DO 未部署**：缺 `wrangler login`。未配置时 UI「仅本地」。Pages 静态托管 ≠ 云端持久化。

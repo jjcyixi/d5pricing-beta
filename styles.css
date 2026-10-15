@@ -567,5 +567,7 @@ fieldset { border: 0; margin: 0; padding: 0; min-width: 0; }
 /* Personal allowance translated into output, not a duplicate tier selector. */
 .generation-output { font-size:18px; line-height:1.5; color:var(--text-80); }
 .generation-output b { font-size:23px; font-weight:600; color:var(--text); }
+.generation-output-row { display:flex; flex-direction:row; flex-wrap:nowrap; align-items:baseline; gap:8px; white-space:nowrap; }
+.generation-output-row .generation-output { display:inline-flex; align-items:baseline; white-space:nowrap; }
 .generation-or { font-size:13px; color:var(--text-60); margin-right:4px; }
 .generation-assumptions { margin-top:4px; }
