@@ -539,3 +539,13 @@ body[data-page="pricing"] .team-plan-card .benefit-terms p {
     font-size: 12px;
   }
 }
+
+
+/* solidify empty collapse */
+body[data-page="pricing"] .pool-note:empty,
+body[data-page="pricing"] .pro-retained:empty,
+body[data-page="pricing"] li:has(> span:empty) {
+  display: none !important;
+}
+body[data-page="pricing"] .plan-list li[hidden] { display: none !important; margin: 0; padding: 0; height: 0; }
+body[data-page="pricing"] .product-scope.pro-anchor { margin-bottom: 4px; }

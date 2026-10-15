@@ -21,7 +21,7 @@
     zh: {
       community: {name:'社区版', desc:'免费开始，体验 AI 设计', info:'免费开始 · 非商用；部分模型与限量云空间', cta:'免费开始'},
       basic: {name:'基础版', desc:'用 AI 探索创意，推进设计', cta:'订阅基础版'},
-      pro: {name:'专业版', desc:'AI 创作，再加完整专业渲染', cta:'订阅专业版'}
+      pro: {name:'专业版', desc:'专业设计与可视化工作流', cta:'订阅专业版'}
     },
     en: {
       community: {name:'Community', desc:'Start free — explore AI design', info:'Free start · non-commercial; selected models & limited cloud', cta:'Start free'},
@@ -62,10 +62,10 @@
           '专属企业客服',
           '100G 云存储',
           '团队后台管理',
-          '使用数据看板',
-          '共享积分池 · 额度配额管理',
-          'AI 创作 · 全部模型 · 可商用',
-          '画布分享与成员/数字资产管理',
+          '团队数据看板',
+          '共享积分池 额度配额管理',
+          'AI 创作 与渲染成果 可商用',
+          '画布分享与参与成员数量不限',
         ],
         seatCompareLabel: '席位权益',
         seatCompare: {
@@ -84,10 +84,10 @@
           '专属企业客服',
           '100G 云存储',
           '团队后台管理',
-          '使用数据看板',
-          '共享积分池 · 额度配额管理',
-          'AI 创作 · 全部模型 · 可商用',
-          '画布分享与成员/数字资产管理',
+          '团队数据看板',
+          '共享积分池 额度配额管理',
+          'AI 创作 与渲染成果 可商用',
+          '画布分享与参与成员数量不限',
         ],
         termsLabel: '充值与合同说明',
         termsBody: '积分不过期；额度不足由管理员充值；合同价由销售确认。',

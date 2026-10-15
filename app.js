@@ -50,7 +50,6 @@ function capacityBlock(plan) {
       <div class="generation-output" data-edit-key="plan.${plan}.capacityImages"><b data-image-count>${images.toLocaleString('en-US')}</b> ${q('张图片','images')}</div>
       <div class="generation-output" data-edit-key="plan.${plan}.capacityVideo"><span class="generation-or" data-edit-key="plan.${plan}.capacityOr">${q('或','or')}</span> <b data-video-seconds>${videoSeconds.toLocaleString('en-US')}</b> ${q('秒视频','seconds of video')}</div>
     </div>
-    <p class="pool-note" data-edit-key="plan.${plan}.capacityPoolNote">${q('同一积分池，二选一','Same credit pool · either')}</p>
   </div>`;
 }
 function listItemsKeyed(pairs) {
@@ -150,10 +149,10 @@ function renderPlans() {
   grid.innerHTML = ['community','basic','pro'].map(id => {
     const free = id==='community', pro = id==='pro';
     const period = free ? q('/ 免费体验','/ free') : state.billing==='annual' ? q('/ 年','/ year') : q('/ 月','/ month');
-    const scope = free ? q('Arco 体验 · Render 社区版','Arco exploration · Render Community') : pro ? q('Arco + D5 Render 专业版','Arco + D5 Render Pro') : q('Arco · AI 创作','Arco · AI creation');
+    const scope = free ? q('Arco 体验 · Render 社区版','Arco exploration · Render Community') : pro ? q('D5 Render 专业版权益完整保留','Full D5 Render Pro benefits retained') : q('Arco · AI 创作','Arco · AI creation');
     const context=free?q('免费开始，探索你的第一个项目','Start free. Explore your first project.') : state.billing==='annual'?q('年费一次支付 · 积分按月发放','Annual payment · monthly credits'):q('按月购买 · 积分按月发放','Monthly payment · monthly credits');
     const batch=D.monthlyBatch(true), once=D.communityCredits(), days=D.communityDays();
-    const credit=free?`<div class="credit-kicker" data-edit-key="plan.community.creditKicker">${q('登录一次性领取','One-time on sign-in')}</div><div class="credit-amount"><strong data-demo-field="communityCredits" title="演示积分：框内直接修改">${once}</strong> ${q('积分','credits')}</div><p class="credit-basis" data-edit-key="plan.community.creditBasis">${q(`有效期 ${days} 天`,`Valid for ${days} days`)}</p>`:`<div class="credit-kicker" data-edit-key="plan.${id}.creditKicker">${q('每月基础积分','Monthly base credits')}</div><div class="credit-amount"><strong data-demo-field="monthlyCredits" title="演示积分：框内直接修改">${batch.base}</strong><span class="launch-gift" data-demo-field="launchBonus" title="演示赠送：框内直接修改"> + ${batch.bonus} <small data-edit-key="launch.giftLabel">${q('限时赠送','launch bonus')}</small></span></div><p class="credit-basis" data-edit-key="plan.${id}.creditBasis">${q(`合资格批次共 ${batch.total} 积分`,`${batch.total} credits per eligible batch`)}</p>`;
+    const credit=free?`<div class="credit-kicker" data-edit-key="plan.community.creditKicker">${q('登录一次性领取','One-time on sign-in')}</div><div class="credit-amount"><strong data-demo-field="communityCredits" title="演示积分：框内直接修改">${once}</strong> ${q('积分','credits')}</div><p class="credit-basis" data-edit-key="plan.community.creditBasis">${q(`有效期 ${days} 天`,`Valid for ${days} days`)}</p>`:`<div class="credit-kicker" data-edit-key="plan.${id}.creditKicker">${q('每月基础积分','Monthly base credits')}</div><div class="credit-amount"><strong data-demo-field="monthlyCredits" title="演示积分：框内直接修改">${batch.base}</strong><span class="launch-gift" data-demo-field="launchBonus" title="演示赠送：框内直接修改"> + ${batch.bonus} <small data-edit-key="launch.giftLabel">${q('限时赠送','launch bonus')}</small></span></div><p class="credit-basis" data-edit-key="plan.${id}.creditBasis">${q(`共 ${batch.total} 积分`,`${batch.total} credits total`)}</p>`;
     const benefits = (() => {
       const html = benefitBlocks(id);
       const marker = `data-edit-key="plan.${id}.aiLabel"`;
@@ -163,10 +162,7 @@ function renderPlans() {
       if (close < 0) return html;
       return html.slice(0, close + 6) + `<div class="card-credit">${credit}</div>` + html.slice(close + 6);
     })();
-    const retained = pro
-      ? `<p class="pro-retained" data-edit-key="plan.pro.retained">${q('原 D5 Render 专业版权益完整保留', 'All existing D5 Render Pro benefits retained')}</p>`
-      : '';
-    return `<article class="plan-card ${id}" data-plan-card="${id}" data-personal-card="1"><div class="plan-zone-a"><div class="plan-title"><div class="plan-name"><h2 data-edit-key="plan.${id}.name">${meta[id].name}</h2></div><p class="plan-desc plan-position" data-edit-key="plan.${id}.value">${meta[id].desc}</p></div><p class="product-scope ${pro?'pro-anchor':''}" data-edit-key="plan.${id}.scope">${scope}</p>${retained}
+    return `<article class="plan-card ${id}" data-plan-card="${id}" data-personal-card="1"><div class="plan-zone-a"><div class="plan-title"><div class="plan-name"><h2 data-edit-key="plan.${id}.name">${meta[id].name}</h2></div><p class="plan-desc plan-position" data-edit-key="plan.${id}.value">${meta[id].desc}</p></div><p class="product-scope ${pro?'pro-anchor':''}" data-edit-key="plan.${id}.scope">${scope}</p>
       <div class="plan-price"><span class="price-value" data-price="${id}" data-demo-field="price.${id}" title="演示价格：框内直接修改">${free?'¥0':money(D.price(id,state.billing))}</span>${state.lang==='en'?'<span class="currency-cny">CNY</span>':''}<span class="price-period" data-edit-key="plan.${id}.period">${period}</span></div>
       <p class="price-context" data-edit-key="plan.${id}.context">${context}</p></div><button type="button" class="plan-button" data-preview-plan="${id}" data-edit-key="${free ? `plan.${id}.cta` : `plan.${id}.cta.${state.billing}`}">${free ? meta[id].cta : (state.billing === 'annual' ? q('立即购买','Buy now') : q('立即订阅','Subscribe now'))}</button>${benefits}</article>`;
   }).join('');
